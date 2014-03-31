@@ -1,7 +1,7 @@
 Summary: Commit RPMs to an OSTree repository
 Name: rpm-ostree
-Version: 2014.6.3.g5707fa7
-Release: 2%{?dist}
+Version: 2014.7
+Release: 1%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
@@ -59,6 +59,9 @@ make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p -c"
 %{_datadir}/%{name}-autobuilder/
 
 %changelog
+* Mon Mar 31 2014 Colin Walters <walters@verbum.org>
+- New upstream release
+
 * Sat Mar 22 2014 Colin Walters <walters@verbum.org> - 2014.6.3.g5707fa7-2
 - Bump ostree version requirement
 
