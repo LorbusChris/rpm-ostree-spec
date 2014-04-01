@@ -53,6 +53,7 @@ make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p -c"
 %doc COPYING README.md
 %{_bindir}/rpm-ostree
 %{_libdir}/%{name}/
+%{_mandir}/man*/*.gz
 
 %files autobuilder
 %{_bindir}/rpm-ostree-autobuilder
