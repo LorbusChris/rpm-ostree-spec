@@ -1,7 +1,7 @@
 Summary: Commit RPMs to an OSTree repository
 Name: rpm-ostree
 Version: 2014.7
-Release: 1%{?dist}
+Release: 2%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
@@ -18,7 +18,8 @@ BuildRequires: pkgconfig(json-glib-1.0)
 BuildRequires: pkgconfig(rpm)
 BuildRequires: pkgconfig(hawkey)
 
-Requires: /usr/bin/yum
+# For now only treecompose requires this
+#Requires: /usr/bin/yum
 Requires: ostree >= 2014.3
 
 %description
@@ -61,6 +62,9 @@ make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p -c"
 %{_datadir}/%{name}-autobuilder/
 
 %changelog
+* Tue Apr 08 2014 Colin Walters <walters@verbum.org>
+- Drop requires on yum to allow minimal images without it
+
 * Mon Mar 31 2014 Colin Walters <walters@verbum.org>
 - New upstream release
 
