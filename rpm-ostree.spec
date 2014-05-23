@@ -1,6 +1,6 @@
-Summary: Commit RPMs to an OSTree repository
+Summary: Client side upgrade program and server side compose tool
 Name: rpm-ostree
-Version: 2014.8
+Version: 2014.100
 Release: 1%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
@@ -23,21 +23,9 @@ BuildRequires: pkgconfig(hawkey)
 Requires: ostree >= 2014.3
 
 %description
-This tool takes a set of packages, and commits them to an OSTree
-repository.  At the moment, it is intended for use on build servers.
-
-%package        autobuilder
-Summary:	Build server for rpm-ostree
-Group:		System Environment/Base
-Requires:	%{name}%{?_isa} = %{version}-%{release}
-Requires:	/usr/bin/gjs
-Requires:	/usr/bin/guestmount
-Requires:	libguestfs-gobject
-BuildRequires:	/usr/bin/g-ir-scanner
-BuildRequires:	readline-devel
-
-%description    autobuilder
-An automatic build server for rpm-ostree.
+This tool binds together the world of RPM packages with the OSTree
+model of bootable filesystem trees.  It provides commands usable both
+on client systems as well as server-side composes.
 
 %prep
 %setup -q -n %{name}-%{version}
@@ -56,12 +44,10 @@ make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p -c"
 %{_libdir}/%{name}/
 %{_mandir}/man*/*.gz
 
-%files autobuilder
-%{_bindir}/rpm-ostree-autobuilder
-%{_libdir}/%{name}-autobuilder/
-%{_datadir}/%{name}-autobuilder/
-
 %changelog
+* Fri May 23 2014 Colin Walters <walters@verbum.org>
+- Previous autobuilder code is split off into rpm-ostree-toolbox
+
 * Sun Apr 13 2014 Colin Walters <walters@verbum.org>
 - New upstream release
 
