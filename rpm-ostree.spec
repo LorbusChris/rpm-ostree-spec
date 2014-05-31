@@ -1,6 +1,6 @@
 Summary: Client side upgrade program and server side compose tool
 Name: rpm-ostree
-Version: 2014.100
+Version: 2014.101
 Release: 1%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
@@ -45,6 +45,9 @@ make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p -c"
 %{_mandir}/man*/*.gz
 
 %changelog
+* Fri May 30 2014 Colin Walters <walters@verbum.org>
+- New upstream release
+
 * Fri May 23 2014 Colin Walters <walters@verbum.org>
 - Previous autobuilder code is split off into rpm-ostree-toolbox
 
