@@ -1,7 +1,7 @@
 Summary: Client side upgrade program and server side compose tool
 Name: rpm-ostree
-Version: 2014.101.5.g87a00be
-Release: 1%{?dist}
+Version: 2014.103
+Release: 2%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
@@ -12,7 +12,7 @@ BuildRequires: autoconf automake libtool
 # For docs
 BuildRequires: gtk-doc
 BuildRequires: gnome-common
-BuildRequires: pkgconfig(ostree-1) >= 2014.4
+BuildRequires: pkgconfig(ostree-1) >= 2014.5
 BuildRequires: pkgconfig(libgsystem)
 BuildRequires: pkgconfig(json-glib-1.0)
 BuildRequires: pkgconfig(rpm)
@@ -20,7 +20,7 @@ BuildRequires: pkgconfig(hawkey)
 
 # For now only treecompose requires this
 #Requires: /usr/bin/yum
-Requires: ostree >= 2014.3
+Requires: ostree >= 2014.5
 
 %description
 This tool binds together the world of RPM packages with the OSTree
@@ -32,7 +32,7 @@ on client systems as well as server-side composes.
 
 %build
 env NOCONFIGURE=1 ./autogen.sh
-%configure --disable-silent-rules
+%configure --disable-silent-rules --enable-patched-hawkey-and-libsolv --enable-usrbinatomic
 make %{?_smp_mflags}
 
 %install
@@ -40,11 +40,19 @@ make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p -c"
 
 %files
 %doc COPYING README.md
+%{_bindir}/atomic
 %{_bindir}/rpm-ostree
 %{_libdir}/%{name}/
 %{_mandir}/man*/*.gz
 
 %changelog
+* Sat Jun 21 2014 Colin Walters <walters@verbum.org>
+- New upstream release
+- Bump OSTree requirements
+- Enable hawkey package diff, we have new enough versions
+  of libsolv/hawkey
+- Enable /usr/bin/atomic symbolic link
+
 * Tue Jun 10 2014 Colin Walters <walters@verbum.org>
 - New upstream git snapshot
 
