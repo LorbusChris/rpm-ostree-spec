@@ -1,7 +1,7 @@
 Summary: Client side upgrade program and server side compose tool
 Name: rpm-ostree
 Version: 2014.106
-Release: 1%{?dist}
+Release: 2%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
@@ -20,7 +20,7 @@ BuildRequires: pkgconfig(hawkey)
 
 # For now only treecompose requires this
 #Requires: /usr/bin/yum
-Requires: ostree >= 2014.5
+Requires: ostree >= 2014.6
 
 %description
 This tool binds together the world of RPM packages with the OSTree
@@ -46,8 +46,9 @@ make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p -c"
 %{_mandir}/man*/*.gz
 
 %changelog
-* Mon Sep 08 2014 Colin Walters <walters@redhat.com> - 2014.106-1
+* Mon Sep 08 2014 Colin Walters <walters@redhat.com> - 2014.106-2
 - New upstream release
+- Bump requirement on ostree
 
 * Mon Aug 18 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 2014.105-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
