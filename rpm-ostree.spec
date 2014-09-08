@@ -1,7 +1,7 @@
 Summary: Client side upgrade program and server side compose tool
 Name: rpm-ostree
 Version: 2014.106
-Release: 2%{?dist}
+Release: 3%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
@@ -12,7 +12,7 @@ BuildRequires: autoconf automake libtool
 # For docs
 BuildRequires: gtk-doc
 BuildRequires: gnome-common
-BuildRequires: pkgconfig(ostree-1) >= 2014.5
+BuildRequires: pkgconfig(ostree-1) >= 2014.6
 BuildRequires: pkgconfig(libgsystem)
 BuildRequires: pkgconfig(json-glib-1.0)
 BuildRequires: pkgconfig(rpm)
@@ -46,7 +46,7 @@ make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p -c"
 %{_mandir}/man*/*.gz
 
 %changelog
-* Mon Sep 08 2014 Colin Walters <walters@redhat.com> - 2014.106-2
+* Mon Sep 08 2014 Colin Walters <walters@redhat.com> - 2014.106-3
 - New upstream release
 - Bump requirement on ostree
 
