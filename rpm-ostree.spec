@@ -17,6 +17,7 @@ BuildRequires: pkgconfig(libgsystem)
 BuildRequires: pkgconfig(json-glib-1.0)
 BuildRequires: pkgconfig(rpm)
 BuildRequires: pkgconfig(hawkey)
+BuildRequires: libcap-devel
 
 # For now only treecompose requires this
 #Requires: /usr/bin/yum
