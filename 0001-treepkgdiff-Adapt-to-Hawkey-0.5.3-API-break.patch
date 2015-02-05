@@ -1,0 +1,48 @@
+From 9dcc4c115f1eec17c9fb3dee4d57f63e90c2300c Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Thu, 5 Feb 2015 09:31:48 -0500
+Subject: [PATCH] Adapt to API break
+
+---
+ configure.ac                |  2 ++
+ src/rpmostree-treepkgdiff.c | 11 ++++++++++-
+ 2 files changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/configure.ac b/configure.ac
+index dcb75a1..6240c88 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -45,6 +45,8 @@ PKG_CHECK_MODULES(PKGDEP_GIO_UNIX, [gio-unix-2.0])
+ PKG_CHECK_MODULES(PKGDEP_RPMOSTREE, [gio-unix-2.0 json-glib-1.0
+ 				     ostree-1 >= 2015.1 libgsystem >= 2015.1
+ 				     rpm hawkey])
++AS_IF([pkg-config --atleast-version=0.5.3 hawkey],
++      [AC_DEFINE([BUILDOPT_HAWKEY_SACK_CREATE2], 1, [Hawkey ABI change in 0.5.3])])
+ AC_PATH_PROG([XSLTPROC], [xsltproc])
+ 
+ GLIB_TESTS
+diff --git a/src/rpmostree-treepkgdiff.c b/src/rpmostree-treepkgdiff.c
+index f722e7e..6771ad8 100644
+--- a/src/rpmostree-treepkgdiff.c
++++ b/src/rpmostree-treepkgdiff.c
+@@ -38,7 +38,16 @@ rpmostree_get_pkglist_for_root (GFile            *root,
+   _cleanup_hyquery_ HyQuery query = NULL;
+   _cleanup_hypackagelist_ HyPackageList pkglist = NULL;
+ 
+-  sack = hy_sack_create (NULL, NULL, gs_file_get_path_cached (root), 0);
++#ifdef BUILDOPT_HAWKEY_SACK_CREATE2
++  sack = hy_sack_create (NULL, NULL,
++                         gs_file_get_path_cached (root),
++                         NULL,
++                         HY_MAKE_CACHE_DIR);
++#else
++  sack = hy_sack_create (NULL, NULL,
++                         gs_file_get_path_cached (root),
++                         HY_MAKE_CACHE_DIR);
++#endif
+   if (sack == NULL)
+     {
+       g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+-- 
+1.8.3.1
+

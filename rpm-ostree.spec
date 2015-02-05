@@ -5,6 +5,7 @@ Release: 3%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
+Patch0: 0001-treepkgdiff-Adapt-to-Hawkey-0.5.3-API-break.patch
 License: LGPLv2+
 URL: https://github.com/cgwalters/rpm-ostree
 # We always run autogen.sh
@@ -29,7 +30,7 @@ model of bootable filesystem trees.  It provides commands usable both
 on client systems as well as server-side composes.
 
 %prep
-%setup -q -n %{name}-%{version}
+%autosetup -Sgit -n %{name}-%{version}
 
 %build
 env NOCONFIGURE=1 ./autogen.sh
@@ -47,6 +48,9 @@ make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p -c"
 %{_mandir}/man*/*.gz
 
 %changelog
+* Thu Feb 05 2015 Colin Walters <walters@redhat.com> - 2015.3-3
+- Adapt to Hawkey 0.5.3 API break
+
 * Thu Feb 05 2015 Dennis Gilmore <dennis@ausil.us> - 2015.3-3
 - rebuild for libhawkey soname bump
 
