@@ -1,7 +1,7 @@
 Summary: Client side upgrade program and server side compose tool
 Name: rpm-ostree
 Version: 2015.3
-Release: 3%{?dist}
+Release: 4%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
@@ -9,7 +9,7 @@ Patch0: 0001-treepkgdiff-Adapt-to-Hawkey-0.5.3-API-break.patch
 License: LGPLv2+
 URL: https://github.com/cgwalters/rpm-ostree
 # We always run autogen.sh
-BuildRequires: autoconf automake libtool
+BuildRequires: autoconf automake libtool git
 # For docs
 BuildRequires: gtk-doc
 BuildRequires: gnome-common
@@ -48,6 +48,9 @@ make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p -c"
 %{_mandir}/man*/*.gz
 
 %changelog
+* Fri Feb 06 2015 Dennis Gilmore <dennis@ausil.us> - 2015.3-4
+- add git to BuildRequires
+
 * Thu Feb 05 2015 Colin Walters <walters@redhat.com> - 2015.3-3
 - Adapt to Hawkey 0.5.3 API break
 
