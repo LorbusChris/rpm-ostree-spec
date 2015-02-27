@@ -1,7 +1,7 @@
 Summary: Client side upgrade program and server side compose tool
 Name: rpm-ostree
 Version: 2015.3
-Release: 4%{?dist}
+Release: 5%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
@@ -34,7 +34,7 @@ on client systems as well as server-side composes.
 
 %build
 env NOCONFIGURE=1 ./autogen.sh
-%configure --disable-silent-rules --enable-patched-hawkey-and-libsolv --enable-usrbinatomic
+%configure --disable-silent-rules --enable-patched-hawkey-and-libsolv
 make %{?_smp_mflags}
 
 %install
@@ -42,12 +42,14 @@ make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p -c"
 
 %files
 %doc COPYING README.md
-%{_bindir}/atomic
 %{_bindir}/rpm-ostree
 %{_libdir}/%{name}/
 %{_mandir}/man*/*.gz
 
 %changelog
+* Fri Feb 27 2015 Colin Walters <walters@redhat.com> - 2015.3-5
+- Drop /usr/bin/atomic, now provided by the "atomic" package
+
 * Fri Feb 06 2015 Dennis Gilmore <dennis@ausil.us> - 2015.3-4
 - add git to BuildRequires
 
