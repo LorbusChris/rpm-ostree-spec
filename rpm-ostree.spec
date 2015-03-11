@@ -20,6 +20,7 @@ BuildRequires: pkgconfig(rpm)
 BuildRequires: pkgconfig(hawkey)
 BuildRequires: pkgconfig(libhif)
 BuildRequires: libcap-devel
+BuildRequires: libattr-devel
 
 # For now only treecompose requires this
 #Requires: /usr/bin/yum
