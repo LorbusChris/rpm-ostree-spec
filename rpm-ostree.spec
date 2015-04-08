@@ -1,11 +1,11 @@
 Summary: Client side upgrade program and server side compose tool
 Name: rpm-ostree
 Version: 2015.3
-Release: 5%{?dist}
+Release: 7%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
-Patch0: 0001-treepkgdiff-Adapt-to-Hawkey-0.5.3-API-break.patch
+Patch0: 2015.3-yumbased.patch
 License: LGPLv2+
 URL: https://github.com/cgwalters/rpm-ostree
 # We always run autogen.sh
@@ -36,7 +36,7 @@ on client systems as well as server-side composes.
 
 %build
 env NOCONFIGURE=1 ./autogen.sh
-%configure --disable-silent-rules --enable-patched-hawkey-and-libsolv
+%configure --disable-silent-rules --enable-patched-hawkey-and-libsolv  --with-yum-binary=/usr/bin/yum-deprecated
 make %{?_smp_mflags}
 
 %install
@@ -49,6 +49,10 @@ make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p -c"
 %{_mandir}/man*/*.gz
 
 %changelog
+* Wed Apr 08 2015 Colin Walters <walters@redhat.com> - 2015.3-7
+- Add patch to use yum-deprecated
+  Resolves: #1209695
+
 * Fri Feb 27 2015 Colin Walters <walters@redhat.com> - 2015.3-5
 - Drop /usr/bin/atomic, now provided by the "atomic" package
 
