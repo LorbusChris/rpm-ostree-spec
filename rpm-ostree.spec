@@ -1,7 +1,7 @@
 Summary: Client side upgrade program and server side compose tool
 Name: rpm-ostree
 Version: 2015.3
-Release: 7%{?dist}
+Release: 8%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
@@ -49,6 +49,10 @@ make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p -c"
 %{_mandir}/man*/*.gz
 
 %changelog
+* Thu Apr 09 2015 Colin Walters <walters@redhat.com> - 2015.3-8
+- Cherry pick f21 patch to disable read only /etc with yum which
+  breaks when run inside docker
+
 * Wed Apr 08 2015 Colin Walters <walters@redhat.com> - 2015.3-7
 - Add patch to use yum-deprecated
   Resolves: #1209695

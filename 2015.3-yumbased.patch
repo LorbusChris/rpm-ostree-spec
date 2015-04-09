@@ -1,7 +1,7 @@
 From 3d214c4a4f42d48ae3752f50d3a3aa92264b821e Mon Sep 17 00:00:00 2001
 From: Colin Walters <walters@verbum.org>
 Date: Thu, 5 Feb 2015 09:21:07 -0500
-Subject: [PATCH 1/2] treepkgdiff: Adapt to Hawkey 0.5.3 API break
+Subject: [PATCH 1/3] treepkgdiff: Adapt to Hawkey 0.5.3 API break
 
 We will work on both old and new versions.
 
@@ -56,7 +56,7 @@ index f722e7e..b09c72e 100644
 From 99765147e70ea140549841a8dcec52ff6a7f580f Mon Sep 17 00:00:00 2001
 From: Colin Walters <walters@verbum.org>
 Date: Wed, 8 Apr 2015 09:01:00 -0400
-Subject: [PATCH 2/2] build: Add --with-yum-binary, use yum-deprecated
+Subject: [PATCH 2/3] build: Add --with-yum-binary, use yum-deprecated
 
 Related: https://github.com/projectatomic/rpm-ostree/issues/121
 ---
@@ -125,6 +125,36 @@ index fc1220f..00f8ed6 100644
          _rpmostree_perror_fatal ("execvp");
      }
  
+-- 
+1.8.3.1
+
+
+From e6a8deb6934475d18fcb0ad1ae231fdfd6d23ae3 Mon Sep 17 00:00:00 2001
+From: rpm-build <rpm-build>
+Date: Thu, 19 Mar 2015 09:51:41 -0400
+Subject: [PATCH 3/3] compose: Disable /etc RO bind mount - breaks in Docker
+ containers
+
+For reasons I haven't yet debugged - it makes the Docker bind mount of
+/etc/resolv.conf go away.
+---
+ src/rpmostree-compose-builtin-tree.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/src/rpmostree-compose-builtin-tree.c b/src/rpmostree-compose-builtin-tree.c
+index 00f8ed6..99ee65f 100644
+--- a/src/rpmostree-compose-builtin-tree.c
++++ b/src/rpmostree-compose-builtin-tree.c
+@@ -853,9 +853,6 @@ rpmostree_compose_builtin_tree (int             argc,
+             goto out;
+         }
+ 
+-      /* Protect the system's /etc and /usr */
+-      if (!_rpmostree_libcontainer_bind_mount_readonly ("/etc", error))
+-        goto out;
+       if (!_rpmostree_libcontainer_bind_mount_readonly ("/usr", error))
+         goto out;
+     }
 -- 
 1.8.3.1
 
