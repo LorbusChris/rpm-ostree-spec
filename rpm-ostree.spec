@@ -1,11 +1,10 @@
 Summary: Client side upgrade program and server side compose tool
 Name: rpm-ostree
-Version: 2015.3
-Release: 8%{?dist}
+Version: 2015.4
+Release: 2%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
-Patch0: 2015.3-yumbased.patch
 License: LGPLv2+
 URL: https://github.com/cgwalters/rpm-ostree
 # We always run autogen.sh
@@ -22,8 +21,6 @@ BuildRequires: pkgconfig(libhif)
 BuildRequires: libcap-devel
 BuildRequires: libattr-devel
 
-# For now only treecompose requires this
-#Requires: /usr/bin/yum
 Requires: ostree >= 2014.6
 
 %description
@@ -36,7 +33,7 @@ on client systems as well as server-side composes.
 
 %build
 env NOCONFIGURE=1 ./autogen.sh
-%configure --disable-silent-rules --enable-patched-hawkey-and-libsolv  --with-yum-binary=/usr/bin/yum-deprecated
+%configure --disable-silent-rules --enable-patched-hawkey-and-libsolv
 make %{?_smp_mflags}
 
 %install
@@ -49,6 +46,10 @@ make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p -c"
 %{_mandir}/man*/*.gz
 
 %changelog
+* Fri Apr 10 2015 Colin Walters <walters@redhat.com> - 2015.4-2
+- New upstream release
+  Port to libhif, drops dependency on yum.
+
 * Thu Apr 09 2015 Colin Walters <walters@redhat.com> - 2015.3-8
 - Cherry pick f21 patch to disable read only /etc with yum which
   breaks when run inside docker
