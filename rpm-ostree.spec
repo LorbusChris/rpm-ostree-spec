@@ -12,6 +12,7 @@ BuildRequires: autoconf automake libtool git
 # For docs
 BuildRequires: gtk-doc
 BuildRequires: gnome-common
+BuildRequires: gobject-introspection
 BuildRequires: pkgconfig(ostree-1) >= 2015.1
 BuildRequires: pkgconfig(libgsystem)
 BuildRequires: pkgconfig(json-glib-1.0)
@@ -28,26 +29,46 @@ This tool binds together the world of RPM packages with the OSTree
 model of bootable filesystem trees.  It provides commands usable both
 on client systems as well as server-side composes.
 
+%package devel
+Summary: Development headers for %{name}
+Group: Development/Libraries
+Requires: %{name} = %{version}-%{release}
+
+%description devel
+The %{name}-devel package includes the header files for the %{name} library.
+
 %prep
 %autosetup -Sgit -n %{name}-%{version}
 
 %build
 env NOCONFIGURE=1 ./autogen.sh
-%configure --disable-silent-rules --enable-patched-hawkey-and-libsolv
+%configure --disable-silent-rules --enable-gtk-doc --enable-patched-hawkey-and-libsolv
 make %{?_smp_mflags}
 
 %install
 make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p -c"
+find $RPM_BUILD_ROOT -name '*.la' -delete
 
 %files
 %doc COPYING README.md
 %{_bindir}/rpm-ostree
 %{_libdir}/%{name}/
 %{_mandir}/man*/*.gz
+%{_libdir}/*.so.1*
+%{_libdir}/girepository-1.0/*.typelib
+
+%files devel
+%{_libdir}/lib*.so
+%{_includedir}/*
+%{_libdir}/pkgconfig/*
+%dir %{_datadir}/gtk-doc/html/*
+%{_datadir}/gtk-doc/html/*
+%{_datadir}/gir-1.0/*-1.0.gir
 
 %changelog
 * Mon May 11 2015 Colin Walters <walters@redhat.com> - 2015.5-2
 - New upstream release
+  Adds shared library and -devel subpackage
 
 * Fri Apr 10 2015 Colin Walters <walters@redhat.com> - 2015.4-2
 - New upstream release
