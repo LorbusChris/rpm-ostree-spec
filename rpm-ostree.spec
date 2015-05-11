@@ -1,6 +1,6 @@
 Summary: Client side upgrade program and server side compose tool
 Name: rpm-ostree
-Version: 2015.4
+Version: 2015.5
 Release: 2%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
@@ -46,6 +46,9 @@ make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p -c"
 %{_mandir}/man*/*.gz
 
 %changelog
+* Mon May 11 2015 Colin Walters <walters@redhat.com> - 2015.5-2
+- New upstream release
+
 * Fri Apr 10 2015 Colin Walters <walters@redhat.com> - 2015.4-2
 - New upstream release
   Port to libhif, drops dependency on yum.
