@@ -1,11 +1,10 @@
 Summary: Client side upgrade program and server side compose tool
 Name: rpm-ostree
-Version: 2015.5
-Release: 3%{?dist}
+Version: 2015.6
+Release: 2%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
-Patch0: 0001-postprocess-Handle-Fedora-rawhide-kernel-installatio.patch
 License: LGPLv2+
 URL: https://github.com/cgwalters/rpm-ostree
 # We always run autogen.sh
@@ -67,6 +66,9 @@ find $RPM_BUILD_ROOT -name '*.la' -delete
 %{_datadir}/gir-1.0/*-1.0.gir
 
 %changelog
+* Tue Jun 09 2015 Colin Walters <walters@redhat.com> - 2015.6-2
+- New upstream version
+
 * Tue May 12 2015 Colin Walters <walters@redhat.com> - 2015.5-3
 - Add patch to fix rawhide composes
 
