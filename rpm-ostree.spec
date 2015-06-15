@@ -1,6 +1,6 @@
 Summary: Client side upgrade program and server side compose tool
 Name: rpm-ostree
-Version: 2015.6
+Version: 2015.7
 Release: 2%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
@@ -66,6 +66,9 @@ find $RPM_BUILD_ROOT -name '*.la' -delete
 %{_datadir}/gir-1.0/*-1.0.gir
 
 %changelog
+* Mon Jun 15 2015 Colin Walters <walters@redhat.com> - 2015.7-2
+- New upstream version
+
 * Tue Jun 09 2015 Colin Walters <walters@redhat.com> - 2015.6-2
 - New upstream version
 
