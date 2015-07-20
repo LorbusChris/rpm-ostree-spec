@@ -1,7 +1,7 @@
 Summary: Client side upgrade program and server side compose tool
 Name: rpm-ostree
 Version: 2015.7
-Release: 3%{?dist}
+Release: 4%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
@@ -66,6 +66,9 @@ find $RPM_BUILD_ROOT -name '*.la' -delete
 %{_datadir}/gir-1.0/*-1.0.gir
 
 %changelog
+* Mon Jul 20 2015 Colin Walters <walters@redhat.com> - 2015.7-4
+- Rebuild for CentOS update to libhif
+
 * Tue Jun 16 2015 Colin Walters <walters@redhat.com> - 2015.7-3
 - Rebuild to pick up hif_source_set_required()
 
