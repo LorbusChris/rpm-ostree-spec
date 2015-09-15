@@ -49,21 +49,49 @@ make %{?_smp_mflags}
 make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p -c"
 find $RPM_BUILD_ROOT -name '*.la' -delete
 
-%files
-%doc COPYING README.md
-%{_bindir}/rpm-ostree
-%{_libdir}/%{name}/
-%{_mandir}/man*/*.gz
-%{_libdir}/*.so.1*
-%{_libdir}/girepository-1.0/*.typelib
+# I try to do continuous delivery via rpmdistro-gitoverlay while
+# reusing the existing spec files.  Currently RPM only supports
+# mandatory file entries.  What this is doing is making each file
+# entry optional - if it exists it will be picked up.  That
+# way the same spec file works more easily across multiple versions where e.g. an
+# older version might not have a systemd unit file.
+cat > autofiles.py <<EOF
+#!/usr/bin/python
+import os,sys,glob
+os.chdir(os.environ['RPM_BUILD_ROOT'])
+for line in sys.argv[1:]:
+    if line == '':
+        break
+    assert(line[0] == '/')
+    files = glob.glob(line[1:])
+    if len(files) > 0:
+        sys.stderr.write('{0} matched {1} files\n'.format(line, len(files)))
+        sys.stdout.write(line)
+        sys.stdout.write('\n')
+    else:
+        sys.stderr.write('{0} did not match any files\n'.format(line))
+EOF
+python autofiles.py > files \
+  '%{_bindir}/*' \
+  '%{_libdir}/%{name}' \
+  '%{_libdir}/*.so.*' \
+  '%{_mandir}/man*/*' \
+  '%{_libdir}/girepository-1.0/*.typelib' \
+  '%{_sysconfdir}/dbus-1/system.d/*' \
+  '%{_prefix}/lib/systemd/system/*' \
+  '%{_libexecdir}/rpm-ostree*' \
+  '%{_datadir}/dbus-1/system-services'
+python autofiles.py > files.devel \
+  '%{_libdir}/lib*.so' \
+  '%{_includedir}/*' \
+  '%{_libdir}/pkgconfig/*' \
+  '%{_datadir}/gtk-doc/html/*' \
+  '%{_datadir}/gir-1.0/*-1.0.gir'
 
-%files devel
-%{_libdir}/lib*.so
-%{_includedir}/*
-%{_libdir}/pkgconfig/*
-%dir %{_datadir}/gtk-doc/html/*
-%{_datadir}/gtk-doc/html/*
-%{_datadir}/gir-1.0/*-1.0.gir
+%files -f files
+%doc COPYING README.md
+
+%files -f files.devel
 
 %changelog
 * Sat Sep 05 2015 Kalev Lember <klember@redhat.com> - 2015.9-2
