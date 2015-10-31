@@ -1,7 +1,7 @@
 Summary: Client side upgrade program and server side compose tool
 Name: rpm-ostree
 Version: 2015.9
-Release: 2%{?dist}
+Release: 3%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
@@ -23,6 +23,8 @@ BuildRequires: libcap-devel
 BuildRequires: libattr-devel
 
 Requires: ostree >= 2014.6
+
+Patch0: 0001-compose-Ensure-we-ve-cleaned-up-references-to-tmpfs-.patch
 
 %description
 This tool binds together the world of RPM packages with the OSTree
@@ -94,6 +96,9 @@ python autofiles.py > files.devel \
 %files -f files.devel
 
 %changelog
+* Sat Oct 31 2015 Colin Walters <walters@redhat.com> - 2015.9-3
+- Add patch that should fix bodhis use of --workdir-tmpfs
+
 * Sat Sep 05 2015 Kalev Lember <klember@redhat.com> - 2015.9-2
 - Rebuilt for librpm soname bump
 
