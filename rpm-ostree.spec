@@ -1,7 +1,7 @@
 Summary: Client side upgrade program and server side compose tool
 Name: rpm-ostree
 Version: 2015.9
-Release: 3%{?dist}
+Release: 4%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
@@ -93,9 +93,13 @@ python autofiles.py > files.devel \
 %files -f files
 %doc COPYING README.md
 
-%files -f files.devel
+%files devel -f files.devel
 
 %changelog
+* Mon Nov 09 2015 Colin Walters <walters@redhat.com> - 2015.9-4
+- Fix files list for -devel, which should in turn fix Anaconda
+  builds which pull in rpm-ostree, but should not have devel bits.
+
 * Sat Oct 31 2015 Colin Walters <walters@redhat.com> - 2015.9-3
 - Add patch that should fix bodhis use of --workdir-tmpfs
 
