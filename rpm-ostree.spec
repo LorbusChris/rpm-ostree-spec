@@ -1,7 +1,7 @@
 Summary: Client side upgrade program and server side compose tool
 Name: rpm-ostree
-Version: 2015.9
-Release: 4%{?dist}
+Version: 2015.10
+Release: 1%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
@@ -23,8 +23,6 @@ BuildRequires: libcap-devel
 BuildRequires: libattr-devel
 
 Requires: ostree >= 2014.6
-
-Patch0: 0001-compose-Ensure-we-ve-cleaned-up-references-to-tmpfs-.patch
 
 %description
 This tool binds together the world of RPM packages with the OSTree
@@ -64,14 +62,15 @@ os.chdir(os.environ['RPM_BUILD_ROOT'])
 for line in sys.argv[1:]:
     if line == '':
         break
-    assert(line[0] == '/')
-    files = glob.glob(line[1:])
-    if len(files) > 0:
-        sys.stderr.write('{0} matched {1} files\n'.format(line, len(files)))
-        sys.stdout.write(line)
-        sys.stdout.write('\n')
+    if line[0] != '/':
+        sys.stdout.write(line + '\n')
     else:
-        sys.stderr.write('{0} did not match any files\n'.format(line))
+        files = glob.glob(line[1:])
+        if len(files) > 0:
+            sys.stderr.write('{0} matched {1} files\n'.format(line, len(files)))
+            sys.stdout.write(line + '\n')
+        else:
+            sys.stderr.write('{0} did not match any files\n'.format(line))
 EOF
 python autofiles.py > files \
   '%{_bindir}/*' \
@@ -96,6 +95,9 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Sat Nov 21 2015 Colin Walters <walters@redhat.com> - 2015.10-1
+- New upstream version
+
 * Mon Nov 09 2015 Colin Walters <walters@redhat.com> - 2015.9-4
 - Fix files list for -devel, which should in turn fix Anaconda
   builds which pull in rpm-ostree, but should not have devel bits.
