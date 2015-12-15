@@ -1,6 +1,6 @@
 Summary: Client side upgrade program and server side compose tool
 Name: rpm-ostree
-Version: 2015.10
+Version: 2015.11
 Release: 1%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
@@ -95,6 +95,9 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Tue Dec 15 2015 Colin Walters <walters@redhat.com> - 2015.11-1
+- New upstream version
+
 * Sat Nov 21 2015 Colin Walters <walters@redhat.com> - 2015.10-1
 - New upstream version
 
