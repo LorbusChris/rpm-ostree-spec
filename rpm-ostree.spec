@@ -17,6 +17,7 @@ BuildRequires: pkgconfig(ostree-1) >= 2015.1
 BuildRequires: pkgconfig(libgsystem)
 BuildRequires: pkgconfig(json-glib-1.0)
 BuildRequires: pkgconfig(rpm)
+BuildRequires: pkgconfig(libarchive)
 BuildRequires: pkgconfig(hawkey)
 BuildRequires: pkgconfig(libhif)
 BuildRequires: libcap-devel
