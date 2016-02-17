@@ -1,10 +1,11 @@
 Summary: Client side upgrade program and server side compose tool
 Name: rpm-ostree
-Version: 2015.11
+Version: 2015.11.40.gd0fadbf
 Release: 3%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
+Source1: libhif.tar.gz
 License: LGPLv2+
 URL: https://github.com/projectatomic/rpm-ostree
 # We always run autogen.sh
@@ -13,15 +14,21 @@ BuildRequires: autoconf automake libtool git
 BuildRequires: gtk-doc
 BuildRequires: gnome-common
 BuildRequires: gobject-introspection
+# Core requirements
 BuildRequires: pkgconfig(ostree-1) >= 2015.1
 BuildRequires: pkgconfig(libgsystem)
 BuildRequires: pkgconfig(json-glib-1.0)
 BuildRequires: pkgconfig(rpm)
 BuildRequires: pkgconfig(libarchive)
-BuildRequires: pkgconfig(hawkey)
-BuildRequires: pkgconfig(libhif)
 BuildRequires: libcap-devel
 BuildRequires: libattr-devel
+# libhif deps
+BuildRequires: pkgconfig(librepo)
+BuildRequires: pkgconfig(libsolv)
+BuildRequires: pkgconfig(expat)
+BuildRequires: pkgconfig(check)
+BuildRequires: python-devel
+BuildRequires: python-sphinx
 
 Requires: ostree >= 2014.6
 
@@ -40,10 +47,31 @@ The %{name}-devel package includes the header files for the %{name} library.
 
 %prep
 %autosetup -Sgit -n %{name}-%{version}
+tar xf %{SOURCE1}
 
 %build
+(cd libhif
+ cmake \
+     -DCMAKE_INSTALL_PREFIX:PATH=%{_prefix}/libexec/rpm-ostree \
+     -DINCLUDE_INSTALL_DIR:PATH=%{_prefix}/libexec/rpm-ostree/include \
+     -DLIB_INSTALL_DIR:PATH=%{_libdir}/rpm-ostree/ \
+     -DSYSCONF_INSTALL_DIR:PATH=%{_prefix}/libexec/rpm-ostree/etc \
+     -DSHARE_INSTALL_PREFIX:PATH=%{_prefix}/libexec/rpm-ostree/share \
+     -DLIB_SUFFIX=64 \
+     -DBUILD_SHARED_LIBS:BOOL=ON .
+ make %{?_smp_mflags}
+ cat > libhif/libhif.pc<<EOF
+Name: libhif
+Description: Simple package manager interface and librepo
+Version: 
+Requires: glib-2.0, gobject-2.0, librepo, rpm
+Libs: -L$(pwd)/libhif -lhif
+Cflags: -I$(pwd) -I$(pwd)/libhif
+EOF
+)
+export PKG_CONFIG_PATH=$(pwd)/libhif/libhif
 env NOCONFIGURE=1 ./autogen.sh
-%configure --disable-silent-rules --enable-gtk-doc --enable-patched-hawkey-and-libsolv
+%configure --disable-silent-rules --enable-gtk-doc
 make %{?_smp_mflags}
 
 %install
