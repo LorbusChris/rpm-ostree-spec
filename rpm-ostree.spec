@@ -72,7 +72,8 @@ Libs: -L$(pwd)/libhif -lhif
 Cflags: -I$(pwd) -I$(pwd)/libhif
 EOF
 )
-export PKG_CONFIG_PATH=$(pwd)/libhif/libhif
+export PKG_CONFIG_PATH=$(pwd)/libhif/libhif${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}
+export LD_LIBRARY_PATH=$(pwd)/libhif/libhif${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
 env NOCONFIGURE=1 ./autogen.sh
 %configure --disable-silent-rules --enable-gtk-doc
 make %{?_smp_mflags}
