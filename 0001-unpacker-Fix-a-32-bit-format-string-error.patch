@@ -1,0 +1,25 @@
+From f46302c2ab64b48cb3df533421eedb97ba676633 Mon Sep 17 00:00:00 2001
+From: Colin Walters <walters@verbum.org>
+Date: Tue, 23 Feb 2016 13:43:26 -0500
+Subject: [PATCH] unpacker: Fix a 32 bit format string error
+
+---
+ src/libpriv/rpmostree-unpacker.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/libpriv/rpmostree-unpacker.c b/src/libpriv/rpmostree-unpacker.c
+index 5bb61a3..5487a6d 100644
+--- a/src/libpriv/rpmostree-unpacker.c
++++ b/src/libpriv/rpmostree-unpacker.c
+@@ -894,7 +894,7 @@ get_lead_sig_header_as_bytes (RpmOstreeUnpacker *self,
+   if (bytes_remaining > 0)
+     {
+       g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+-                   "Failed to read %" G_GUINT64_FORMAT " bytes of metadata",
++                   "Failed to read %" G_GSIZE_FORMAT " bytes of metadata",
+                    bytes_remaining);
+       goto out;
+     }
+-- 
+1.8.3.1
+

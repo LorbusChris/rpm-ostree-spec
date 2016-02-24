@@ -9,6 +9,7 @@ Source0: rpm-ostree-%{version}.tar.xz
 # Bundled because the library is API/ABI unstable, and we're trying to
 # avoid being version locked with PackageKit/dnf right now.
 Source1: libhif.tar.gz
+Patch0: 0001-unpacker-Fix-a-32-bit-format-string-error.patch
 Provides: bundled(libhif) = 0.7.0
 License: LGPLv2+
 URL: https://github.com/projectatomic/rpm-ostree
