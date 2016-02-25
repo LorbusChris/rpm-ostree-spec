@@ -16,6 +16,7 @@ URL: https://github.com/projectatomic/rpm-ostree
 # We always run autogen.sh
 BuildRequires: autoconf automake libtool git
 # For docs
+BuildRequires: chrpath
 BuildRequires: gtk-doc
 BuildRequires: gnome-common
 BuildRequires: gobject-introspection
@@ -37,6 +38,9 @@ BuildRequires: python-sphinx
 
 Requires: ostree >= 2014.6
 
+# We're using RPATH to pick up our bundled version
+%global __requires_exclude ^libhif[.]so[.].*$
+
 %description
 This tool binds together the world of RPM packages with the OSTree
 model of bootable filesystem trees.  It provides commands usable both
@@ -57,11 +61,11 @@ tar xf %{SOURCE1}
 %build
 (cd libhif
  cmake \
-     -DCMAKE_INSTALL_PREFIX:PATH=%{_prefix}/libexec/rpm-ostree \
-     -DINCLUDE_INSTALL_DIR:PATH=%{_prefix}/libexec/rpm-ostree/include \
-     -DLIB_INSTALL_DIR:PATH=%{_libdir}/rpm-ostree/ \
-     -DSYSCONF_INSTALL_DIR:PATH=%{_prefix}/libexec/rpm-ostree/etc \
-     -DSHARE_INSTALL_PREFIX:PATH=%{_prefix}/libexec/rpm-ostree/share \
+     -DCMAKE_INSTALL_PREFIX:PATH=%{_libexecdir}/rpm-ostree \
+     -DINCLUDE_INSTALL_DIR:PATH=%{_libexecdir}/rpm-ostree/include \
+     -DLIB_INSTALL_DIR:PATH=%{_libexecdir}/rpm-ostree \
+     -DSYSCONF_INSTALL_DIR:PATH=%{_libexecdir}/rpm-ostree/etc \
+     -DSHARE_INSTALL_PREFIX:PATH=%{_libexecdir}/rpm-ostree/share \
      -DLIB_SUFFIX=64 \
      -DBUILD_SHARED_LIBS:BOOL=ON .
  make %{?_smp_mflags}
@@ -77,10 +81,22 @@ EOF
 export PKG_CONFIG_PATH=$(pwd)/libhif/libhif${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}
 export LD_LIBRARY_PATH=$(pwd)/libhif/libhif${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
 env NOCONFIGURE=1 ./autogen.sh
-%configure --disable-silent-rules --enable-gtk-doc
+%configure --disable-silent-rules --enable-gtk-doc LDFLAGS='-Wl,-rpath=%{_libdir}/rpm-ostree'
 make %{?_smp_mflags}
 
 %install
+(cd libhif
+ make install DESTDIR=$RPM_BUILD_ROOT
+ for path in %{_libdir}/python2.7 %{_libexecdir}/rpm-ostree/include %{_libexecdir}/rpm-ostree/pkg-config \
+	     %{_libexecdir}/rpm-ostree/share/man; do \
+     rm $RPM_BUILD_ROOT/${path} -rf; \
+ done
+ install -d $RPM_BUILD_ROOT/%{_libdir}/rpm-ostree
+ # Cherry pick the shared library...
+ mv $RPM_BUILD_ROOT/%{_libexecdir}/rpm-ostree/lib*/libhif*.so.* $RPM_BUILD_ROOT/%{_libdir}/rpm-ostree
+ # and nuke everything else.
+ rm $RPM_BUILD_ROOT/%{_libexecdir}/rpm-ostree -rf
+)
 make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p -c"
 find $RPM_BUILD_ROOT -name '*.la' -delete
 
