@@ -1,6 +1,6 @@
 Summary: Client side upgrade program and server side compose tool
 Name: rpm-ostree
-Version: 2015.11.43.ga2c052b
+Version: 2016.1
 Release: 2%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
@@ -9,7 +9,6 @@ Source0: rpm-ostree-%{version}.tar.xz
 # Bundled because the library is API/ABI unstable, and we're trying to
 # avoid being version locked with PackageKit/dnf right now.
 Source1: libhif.tar.gz
-Patch0: 0001-unpacker-Fix-a-32-bit-format-string-error.patch
 Provides: bundled(libhif) = 0.7.0
 License: LGPLv2+
 URL: https://github.com/projectatomic/rpm-ostree
@@ -146,6 +145,9 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Thu Mar 24 2016 Colin Walters <walters@redhat.com> - 2016.1-2
+- New upstream version
+
 * Tue Feb 23 2016 Colin Walters <walters@redhat.com> - 2015.11.43.ga2c052b-2
 - New git snapshot, just getting some new code out there
 - We are now bundling a copy of libhif, as otherwise coordinated releases with
