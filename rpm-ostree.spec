@@ -20,6 +20,7 @@ BuildRequires: chrpath
 BuildRequires: gtk-doc
 BuildRequires: gnome-common
 BuildRequires: gobject-introspection
+BuildRequires: cmake
 # Core requirements
 BuildRequires: pkgconfig(ostree-1) >= 2015.1
 BuildRequires: pkgconfig(libgsystem)
