@@ -39,6 +39,11 @@ BuildRequires: python-sphinx
 
 Requires: ostree >= 2014.6
 
+# In CentOS7/RHEL the package is client-only right now, but we can do both
+%if 0%{?rhel} != 0 && 0%{?rhel} <= 7
+Provides: rpm-ostree-client
+%endif
+
 # We're using RPATH to pick up our bundled version
 %global __requires_exclude ^libhif[.]so[.].*$
 
