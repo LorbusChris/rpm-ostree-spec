@@ -1,15 +1,16 @@
 Summary: Client side upgrade program and server side compose tool
 Name: rpm-ostree
-Version: 2016.1
-Release: 3%{?dist}
+Version: 2016.3
+Release: 1%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
 # https://github.com/rpm-software-management/libhif
 # Bundled because the library is API/ABI unstable, and we're trying to
 # avoid being version locked with PackageKit/dnf right now.
+# This source is generated via
+#   git archive --format=tar --prefix=libhif/ 
 Source1: libhif.tar.gz
-Patch0: 0001-core-Skip-over-local-packages-for-downloads.patch
 Provides: bundled(libhif) = 0.7.0
 License: LGPLv2+
 URL: https://github.com/projectatomic/rpm-ostree
@@ -31,7 +32,11 @@ BuildRequires: libcap-devel
 BuildRequires: libattr-devel
 # libhif deps
 BuildRequires: pkgconfig(librepo)
+%if (0%{?rhel} != 0 && 0%{?rhel} <= 7)
+BuildRequires: libsolv-devel
+%else
 BuildRequires: pkgconfig(libsolv)
+%endif
 BuildRequires: pkgconfig(expat)
 BuildRequires: pkgconfig(check)
 BuildRequires: python-devel
@@ -152,6 +157,9 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Fri May 20 2016 Colin Walters <walters@redhat.com> - 2016.3-2
+- New upstream version
+
 * Thu Mar 31 2016 Colin Walters <walters@redhat.com> - 2016.1-3
 - Backport patch to fix Fedora composes writing data into source file:/// URIs
 
