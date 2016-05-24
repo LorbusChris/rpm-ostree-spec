@@ -1,3 +1,4 @@
+%bcond_without bundled_libhif
 Summary: Client side upgrade program and server side compose tool
 Name: rpm-ostree
 Version: 2016.3
@@ -10,8 +11,10 @@ Source0: rpm-ostree-%{version}.tar.xz
 # avoid being version locked with PackageKit/dnf right now.
 # This source is generated via
 #   git archive --format=tar --prefix=libhif/ 
+%if %{with bundled_libhif}
 Source1: libhif.tar.gz
 Provides: bundled(libhif) = 0.7.0
+%endif
 License: LGPLv2+
 URL: https://github.com/projectatomic/rpm-ostree
 # We always run autogen.sh
@@ -28,6 +31,10 @@ BuildRequires: pkgconfig(libgsystem)
 BuildRequires: pkgconfig(json-glib-1.0)
 BuildRequires: pkgconfig(rpm)
 BuildRequires: pkgconfig(libarchive)
+%if %{with bundled_libhif}
+%else
+BuildRequires: pkgconfig(libhif)
+%endif
 BuildRequires: libcap-devel
 BuildRequires: libattr-devel
 # libhif deps
@@ -67,9 +74,12 @@ The %{name}-devel package includes the header files for the %{name} library.
 
 %prep
 %autosetup -Sgit -n %{name}-%{version}
+%if %{with bundled_libhif}
 tar xf %{SOURCE1}
+%endif
 
 %build
+%if %{with bundled_libhif}
 (cd libhif
  cmake \
      -DCMAKE_INSTALL_PREFIX:PATH=%{_libexecdir}/rpm-ostree \
@@ -91,11 +101,13 @@ EOF
 )
 export PKG_CONFIG_PATH=$(pwd)/libhif/libhif${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}
 export LD_LIBRARY_PATH=$(pwd)/libhif/libhif${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+%endif
 env NOCONFIGURE=1 ./autogen.sh
 %configure --disable-silent-rules --enable-gtk-doc LDFLAGS='-Wl,-rpath=%{_libdir}/rpm-ostree'
 make %{?_smp_mflags}
 
 %install
+%if %{with bundled_libhif}
 (cd libhif
  make install DESTDIR=$RPM_BUILD_ROOT
  for path in %{_libdir}/python2.7 %{_libexecdir}/rpm-ostree/include %{_libexecdir}/rpm-ostree/pkg-config \
@@ -108,6 +120,7 @@ make %{?_smp_mflags}
  # and nuke everything else.
  rm $RPM_BUILD_ROOT/%{_libexecdir}/rpm-ostree -rf
 )
+%endif
 make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p -c"
 find $RPM_BUILD_ROOT -name '*.la' -delete
 
