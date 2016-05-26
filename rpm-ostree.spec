@@ -24,30 +24,32 @@ BuildRequires: chrpath
 BuildRequires: gtk-doc
 BuildRequires: gnome-common
 BuildRequires: gobject-introspection
-BuildRequires: cmake
 # Core requirements
 BuildRequires: pkgconfig(ostree-1) >= 2015.1
 BuildRequires: pkgconfig(libgsystem)
 BuildRequires: pkgconfig(json-glib-1.0)
 BuildRequires: pkgconfig(rpm)
 BuildRequires: pkgconfig(libarchive)
-%if %{with bundled_libhif}
-%else
-BuildRequires: pkgconfig(libhif)
-%endif
 BuildRequires: libcap-devel
 BuildRequires: libattr-devel
-# libhif deps
+
+# We currently interact directly with librepo
 BuildRequires: pkgconfig(librepo)
+
+%if %{with bundled_libhif}
+BuildRequires: cmake
+BuildRequires: pkgconfig(expat)
+BuildRequires: pkgconfig(check)
+BuildRequires: python-devel
+BuildRequires: python-sphinx
 %if (0%{?rhel} != 0 && 0%{?rhel} <= 7)
 BuildRequires: libsolv-devel
 %else
 BuildRequires: pkgconfig(libsolv)
 %endif
-BuildRequires: pkgconfig(expat)
-BuildRequires: pkgconfig(check)
-BuildRequires: python-devel
-BuildRequires: python-sphinx
+%else
+BuildRequires: pkgconfig(libhif)
+%endif
 
 Requires: ostree >= 2014.6
 
