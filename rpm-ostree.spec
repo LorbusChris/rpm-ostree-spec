@@ -37,6 +37,9 @@ BuildRequires: libattr-devel
 BuildRequires: pkgconfig(librepo)
 
 %if %{with bundled_libhif}
+# We're using RPATH to pick up our bundled version
+%global __requires_exclude ^libhif[.]so[.].*$
+
 BuildRequires: cmake
 BuildRequires: pkgconfig(expat)
 BuildRequires: pkgconfig(check)
@@ -57,9 +60,6 @@ Requires: ostree >= 2014.6
 %if 0%{?rhel} != 0 && 0%{?rhel} <= 7
 Provides: rpm-ostree-client
 %endif
-
-# We're using RPATH to pick up our bundled version
-%global __requires_exclude ^libhif[.]so[.].*$
 
 %description
 This tool binds together the world of RPM packages with the OSTree
@@ -105,7 +105,12 @@ export PKG_CONFIG_PATH=$(pwd)/libhif/libhif${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}
 export LD_LIBRARY_PATH=$(pwd)/libhif/libhif${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
 %endif
 env NOCONFIGURE=1 ./autogen.sh
-%configure --disable-silent-rules --enable-gtk-doc LDFLAGS='-Wl,-rpath=%{_libdir}/rpm-ostree'
+%configure --disable-silent-rules --enable-gtk-doc \
+%if %{with bundled_libhif}
+LDFLAGS='-Wl,-rpath=%{_libdir}/rpm-ostree'
+%else
+
+%endif
 make %{?_smp_mflags}
 
 %install
