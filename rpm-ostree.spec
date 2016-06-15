@@ -1,8 +1,8 @@
 %bcond_without bundled_libhif
 Summary: Client side upgrade program and server side compose tool
 Name: rpm-ostree
-Version: 2016.3
-Release: 1%{?dist}
+Version: 2016.3.3.g17fb980
+Release: 2%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
@@ -177,6 +177,9 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Wed Jun 15 2016 Colin Walters <walters@verbum.org> - 2016.3.3.g17fb980-2
+- Backport fixes from https://github.com/projectatomic/rpm-ostree/commits/2016.3-fixes
+
 * Fri May 20 2016 Colin Walters <walters@redhat.com> - 2016.3-2
 - New upstream version
 
