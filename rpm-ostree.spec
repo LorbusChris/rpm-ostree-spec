@@ -22,6 +22,7 @@ BuildRequires: autoconf automake libtool git
 # For docs
 BuildRequires: chrpath
 BuildRequires: gtk-doc
+BuildRequires: gperf
 BuildRequires: gnome-common
 BuildRequires: gobject-introspection
 # Core requirements
