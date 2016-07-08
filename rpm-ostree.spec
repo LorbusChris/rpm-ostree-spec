@@ -1,6 +1,6 @@
 Summary: Client side upgrade program and server side compose tool
 Name: rpm-ostree
-Version: 2016.3.5.g4219a96
+Version: 2016.4
 Release: 1%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
@@ -42,8 +42,6 @@ BuildRequires: libsolv-devel
 %else
 BuildRequires: pkgconfig(libsolv)
 %endif
-
-Requires: ostree >= 2014.6
 
 # In CentOS7/RHEL the package is client-only right now, but we can do both
 %if 0%{?rhel} != 0 && 0%{?rhel} <= 7
@@ -121,6 +119,9 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Fri Jul 08 2016 walters@redhat.com - 2016.4-1
+- New upstream version
+
 * Thu Jul 07 2016 Colin Walters <walters@verbum.org> - 2016.3.5.g4219a96-1
 - Backport fixes from https://github.com/projectatomic/rpm-ostree/commits/2016.3-fixes
 
