@@ -121,6 +121,9 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Fri Jul 08 2016 walters@verbum.org - 2016.4-2
+- Require bubblewrap
+
 * Fri Jul 08 2016 walters@redhat.com - 2016.4-1
 - New upstream version
 
