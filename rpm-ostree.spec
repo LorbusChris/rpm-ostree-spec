@@ -1,7 +1,7 @@
 Summary: Client side upgrade program and server side compose tool
 Name: rpm-ostree
 Version: 2016.4
-Release: 1%{?dist}
+Release: 2%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
@@ -47,6 +47,8 @@ BuildRequires: pkgconfig(libsolv)
 %if 0%{?rhel} != 0 && 0%{?rhel} <= 7
 Provides: rpm-ostree-client
 %endif
+
+Requires: bubblewrap
 
 %description
 This tool binds together the world of RPM packages with the OSTree
