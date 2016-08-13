@@ -1,11 +1,10 @@
 Summary: Client side upgrade program and server side compose tool
 Name: rpm-ostree
-Version: 2016.6
-Release: 2%{?dist}
+Version: 2016.7
+Release: 1%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
-Patch0: bwrap-treecompose.patch
 License: LGPLv2+
 URL: https://github.com/projectatomic/rpm-ostree
 # We always run autogen.sh
@@ -122,6 +121,9 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Sat Aug 13 2016 walters@redhat.com - 2016.6-3
+- New upstream version
+
 * Sat Aug 13 2016 Colin Walters <walters@verbum.org> - 2016.6-2
 - Backport patches from master to fix non-containerized composes
 
