@@ -1,0 +1,537 @@
+From 88a130da09947c0acdb1d573abfafe24e8971362 Mon Sep 17 00:00:00 2001
+From: Colin Walters <walters@verbum.org>
+Date: Fri, 12 Aug 2016 13:03:23 -0400
+Subject: [PATCH 1/3] lib: Extract bwrap-executing internal API
+
+The treecompose code will learn how to use bwrap instead of
+libcontainer in libglnx, since the latter is a buggy copy of a subset
+of the former.
+
+Closes: #429
+Approved by: jlebon
+---
+ Makefile-libpriv.am             |   2 +
+ src/libpriv/rpmostree-bwrap.c   | 109 ++++++++++++++++++++++++++++++++++++++++
+ src/libpriv/rpmostree-bwrap.h   |  32 ++++++++++++
+ src/libpriv/rpmostree-scripts.c |  82 +++++-------------------------
+ 4 files changed, 155 insertions(+), 70 deletions(-)
+ create mode 100644 src/libpriv/rpmostree-bwrap.c
+ create mode 100644 src/libpriv/rpmostree-bwrap.h
+
+diff --git a/Makefile-libpriv.am b/Makefile-libpriv.am
+index 687c3b8..52bb9f2 100644
+--- a/Makefile-libpriv.am
++++ b/Makefile-libpriv.am
+@@ -30,6 +30,8 @@ librpmostreepriv_la_SOURCES = \
+ 	src/libpriv/rpmostree-refts.c \
+ 	src/libpriv/rpmostree-core.c \
+ 	src/libpriv/rpmostree-core.h \
++	src/libpriv/rpmostree-bwrap.c \
++	src/libpriv/rpmostree-bwrap.h \
+ 	src/libpriv/rpmostree-scripts.c \
+ 	src/libpriv/rpmostree-scripts.h \
+ 	src/libpriv/rpmostree-refsack.h \
+diff --git a/src/libpriv/rpmostree-bwrap.c b/src/libpriv/rpmostree-bwrap.c
+new file mode 100644
+index 0000000..29f79d3
+--- /dev/null
++++ b/src/libpriv/rpmostree-bwrap.c
+@@ -0,0 +1,109 @@
++/* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*-
++ *
++ * Copyright (C) 2016 Red Hat, Inc.
++ *
++ * This program is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published
++ * by the Free Software Foundation; either version 2 of the licence or (at
++ * your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General
++ * Public License along with this library; if not, write to the
++ * Free Software Foundation, Inc., 59 Temple Place, Suite 330,
++ * Boston, MA 02111-1307, USA.
++ */
++
++#include "config.h"
++#include "rpmostree-bwrap.h"
++
++#include <err.h>
++
++void
++rpmostree_ptrarray_append_strdup (GPtrArray *argv_array, ...)
++{
++  va_list args;
++  char *arg;
++
++  va_start (args, argv_array);
++  while ((arg = va_arg (args, char *)))
++    g_ptr_array_add (argv_array, g_strdup (arg));
++  va_end (args);
++}
++
++GPtrArray *
++rpmostree_bwrap_base_argv_new_for_rootfs (int rootfs_fd, GError **error)
++{
++  g_autoptr(GPtrArray) bwrap_argv = g_ptr_array_new_with_free_func (g_free);
++  static const char *usr_links[] = {"lib", "lib32", "lib64", "bin", "sbin"};
++
++  rpmostree_ptrarray_append_strdup (bwrap_argv,
++                                    WITH_BUBBLEWRAP_PATH,
++                                    "--dev", "/dev",
++                                    "--proc", "/proc",
++                                    "--dir", "/tmp",
++                                    "--chdir", "/",
++                                    "--ro-bind", "/sys/block", "/sys/block",
++                                    "--ro-bind", "/sys/bus", "/sys/bus",
++                                    "--ro-bind", "/sys/class", "/sys/class",
++                                    "--ro-bind", "/sys/dev", "/sys/dev",
++                                    "--ro-bind", "/sys/devices", "/sys/devices",
++                                    NULL);
++
++  for (guint i = 0; i < G_N_ELEMENTS (usr_links); i++)
++    {
++      const char *subdir = usr_links[i];
++      struct stat stbuf;
++      char *path;
++
++      if (fstatat (rootfs_fd, subdir, &stbuf, AT_SYMLINK_NOFOLLOW) < 0)
++        {
++          if (errno != ENOENT)
++            {
++              glnx_set_error_from_errno (error);
++              return FALSE;
++            }
++          continue;
++        }
++      else if (!S_ISLNK (stbuf.st_mode))
++        continue;
++
++      g_ptr_array_add (bwrap_argv, g_strdup ("--symlink"));
++
++      path = g_strconcat ("usr/", subdir, NULL);
++      g_ptr_array_add (bwrap_argv, path);
++
++      path = g_strconcat ("/", subdir, NULL);
++      g_ptr_array_add (bwrap_argv, path);
++    }
++
++  return g_steal_pointer (&bwrap_argv);
++}
++
++static void
++child_setup_fchdir (gpointer user_data)
++{
++  int fd = GPOINTER_TO_INT (user_data);
++  if (fchdir (fd) < 0)
++    err (1, "fchdir");
++}
++
++gboolean
++rpmostree_run_sync_fchdir_setup (char **argv_array, GSpawnFlags flags,
++                                 int rootfs_fd, GError **error)
++{
++  int estatus;
++  
++  if (!g_spawn_sync (NULL, argv_array, NULL, flags,
++                     child_setup_fchdir, GINT_TO_POINTER (rootfs_fd),
++                     NULL, NULL, &estatus, error))
++    return FALSE;
++  if (!g_spawn_check_exit_status (estatus, error))
++    return FALSE;
++
++  return TRUE;
++}
+diff --git a/src/libpriv/rpmostree-bwrap.h b/src/libpriv/rpmostree-bwrap.h
+new file mode 100644
+index 0000000..fbf2113
+--- /dev/null
++++ b/src/libpriv/rpmostree-bwrap.h
+@@ -0,0 +1,32 @@
++/* -*- mode: C; c-file-style: "gnu"; indent-tabs-mode: nil; -*-
++ *
++ * Copyright (C) 2016 Colin Walters <walters@verbum.org>
++ *
++ * This program is free software: you can redistribute it and/or modify
++ * it under the terms of the GNU Lesser General Public License as published
++ * by the Free Software Foundation; either version 2 of the licence or (at
++ * your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General
++ * Public License along with this library; if not, write to the
++ * Free Software Foundation, Inc., 59 Temple Place, Suite 330,
++ * Boston, MA 02111-1307, USA.
++ */
++
++#pragma once
++
++#include <ostree.h>
++
++#include "libglnx.h"
++
++GPtrArray *rpmostree_bwrap_base_argv_new_for_rootfs (int rootfs, GError **error);
++
++void rpmostree_ptrarray_append_strdup (GPtrArray *argv_array, ...) G_GNUC_NULL_TERMINATED;
++
++gboolean rpmostree_run_sync_fchdir_setup (char **argv_array, GSpawnFlags flags,
++                                          int rootfs_fd, GError **error);
+diff --git a/src/libpriv/rpmostree-scripts.c b/src/libpriv/rpmostree-scripts.c
+index 0737b59..c33bf35 100644
+--- a/src/libpriv/rpmostree-scripts.c
++++ b/src/libpriv/rpmostree-scripts.c
+@@ -23,6 +23,7 @@
+ #include <gio/gio.h>
+ #include <systemd/sd-journal.h>
+ #include "rpmostree-output.h"
++#include "rpmostree-bwrap.h"
+ #include <err.h>
+ #include "libglnx.h"
+ 
+@@ -74,26 +75,6 @@ static const KnownRpmScriptKind unsupported_scripts[] = {
+ };
+ 
+ static void
+-child_setup_fchdir (gpointer user_data)
+-{
+-  int fd = GPOINTER_TO_INT (user_data);
+-  if (fchdir (fd) < 0)
+-    err (1, "fchdir");
+-}
+-
+-static void
+-add_const_args (GPtrArray *argv_array, ...)
+-{
+-  va_list args;
+-  char *arg;
+-
+-  va_start (args, argv_array);
+-  while ((arg = va_arg (args, char *)))
+-    g_ptr_array_add (argv_array, arg);
+-  va_end (args);
+-}
+-
+-static void
+ fusermount_cleanup (const char *mountpoint)
+ {
+   g_autoptr(GError) tmp_error = NULL;
+@@ -188,9 +169,6 @@ run_script_in_bwrap_container (int rootfs_fd,
+                                GError       **error)
+ {
+   gboolean ret = FALSE;
+-  int i;
+-  const char *usr_links[] = {"lib", "lib32", "lib64", "bin", "sbin"};
+-  int estatus;
+   char *rofiles_mnt = strdupa ("/tmp/rofiles-fuse.XXXXXX");
+   const char *rofiles_argv[] = { "rofiles-fuse", "./usr", rofiles_mnt, NULL};
+   const char *pkg_script = glnx_strjoina (name, ".", scriptdesc+1);
+@@ -200,7 +178,6 @@ run_script_in_bwrap_container (int rootfs_fd,
+   gboolean mntpoint_created = FALSE;
+   gboolean fuse_mounted = FALSE;
+   g_autoptr(GPtrArray) bwrap_argv = g_ptr_array_new ();
+-  g_autoptr(GPtrArray) bwrap_argv_mallocd = g_ptr_array_new_with_free_func (g_free);
+   GSpawnFlags bwrap_spawnflags = G_SPAWN_SEARCH_PATH;
+   gboolean created_var_tmp = FALSE;
+ 
+@@ -209,11 +186,8 @@ run_script_in_bwrap_container (int rootfs_fd,
+ 
+   mntpoint_created = TRUE;
+ 
+-  if (!g_spawn_sync (NULL, (char**)rofiles_argv, NULL, G_SPAWN_SEARCH_PATH,
+-                     child_setup_fchdir, GINT_TO_POINTER (rootfs_fd),
+-                     NULL, NULL, &estatus, error))
+-    goto out;
+-  if (!g_spawn_check_exit_status (estatus, error))
++  if (!rpmostree_run_sync_fchdir_setup ((char**)rofiles_argv, G_SPAWN_SEARCH_PATH,
++                                        rootfs_fd, error))
+     {
+       g_prefix_error (error, "Executing rofiles-fuse: ");
+       goto out;
+@@ -260,65 +234,33 @@ run_script_in_bwrap_container (int rootfs_fd,
+   else
+     created_var_tmp = TRUE;
+ 
+-  add_const_args (bwrap_argv,
+-                  WITH_BUBBLEWRAP_PATH,
++  bwrap_argv = rpmostree_bwrap_base_argv_new_for_rootfs (rootfs_fd, error);
++  if (!bwrap_argv)
++    goto out;
++
++  rpmostree_ptrarray_append_strdup (bwrap_argv,
+                   "--bind", rofiles_mnt, "/usr",
+-                  "--dev", "/dev",
+-                  "--proc", "/proc",
+-                  "--dir", "/tmp",
+-                  "--chdir", "/",
+                   /* Scripts can see a /var with compat links like alternatives */
+                   "--ro-bind", "./var", "/var",
+                   /* But no need to access persistent /tmp, so make it /tmp */
+                   "--bind", "/tmp", "/var/tmp",
+                   /* Allow RPM scripts to change the /etc defaults */
+                   "--symlink", "usr/etc", "/etc",
+-                  "--ro-bind", "/sys/block", "/sys/block",
+-                  "--ro-bind", "/sys/bus", "/sys/bus",
+-                  "--ro-bind", "/sys/class", "/sys/class",
+-                  "--ro-bind", "/sys/dev", "/sys/dev",
+-                  "--ro-bind", "/sys/devices", "/sys/devices",
+                   NULL);
+ 
+-  for (i = 0; i < G_N_ELEMENTS (usr_links); i++)
+-    {
+-      const char *subdir = usr_links[i];
+-      struct stat stbuf;
+-      char *path;
+-
+-      if (!(fstatat (rootfs_fd, subdir, &stbuf, AT_SYMLINK_NOFOLLOW) == 0 && S_ISLNK (stbuf.st_mode)))
+-        continue;
+-
+-      g_ptr_array_add (bwrap_argv, "--symlink");
+-
+-      path = g_strconcat ("usr/", subdir, NULL);
+-      g_ptr_array_add (bwrap_argv_mallocd, path);
+-      g_ptr_array_add (bwrap_argv, path);
+-
+-      path = g_strconcat ("/", subdir, NULL);
+-      g_ptr_array_add (bwrap_argv_mallocd, path);
+-      g_ptr_array_add (bwrap_argv, path);
+-    }
+-
+   { const char *debugscript = getenv ("RPMOSTREE_DEBUG_SCRIPT");
+     if (g_strcmp0 (debugscript, pkg_script) == 0)
+       {
+-        g_ptr_array_add (bwrap_argv, (char*)"/bin/bash");
++        g_ptr_array_add (bwrap_argv, g_strdup ("/bin/bash"));
+         bwrap_spawnflags |= G_SPAWN_CHILD_INHERITS_STDIN;
+       }
+     else
+-      g_ptr_array_add (bwrap_argv, (char*)postscript_path_container);
++      g_ptr_array_add (bwrap_argv, g_strdup (postscript_path_container));
+   }
+   g_ptr_array_add (bwrap_argv, NULL);
+ 
+-  if (!g_spawn_sync (NULL, (char**)bwrap_argv->pdata, NULL, bwrap_spawnflags,
+-                     child_setup_fchdir, GINT_TO_POINTER (rootfs_fd),
+-                     NULL, NULL, &estatus, error))
+-    {
+-      g_prefix_error (error, "Executing bwrap: ");
+-      goto out;
+-    }
+-  if (!g_spawn_check_exit_status (estatus, error))
++  if (!rpmostree_run_sync_fchdir_setup ((char**)bwrap_argv->pdata,
++                                        bwrap_spawnflags, rootfs_fd, error))
+     {
+       g_prefix_error (error, "Executing bwrap: ");
+       goto out;
+-- 
+2.7.4
+
+
+From 551e4c91f91c4b908dacd50c6d251c57c2544af8 Mon Sep 17 00:00:00 2001
+From: Colin Walters <walters@verbum.org>
+Date: Fri, 12 Aug 2016 16:17:35 -0400
+Subject: [PATCH 2/3] postprocess: Switch to using bwrap for script execution
+
+The previous commit https://github.com/projectatomic/rpm-ostree/pull/422
+introduced a regression in the "outside of a container" path - we
+get `EINVAL` trying to `mount("proc",...)` and honestly I'm not sure why.
+
+We can either back up or plow forward, and it turns out to be
+pretty straightforward to complete the port to using bwrap.
+
+I extracted the bwrap-execution code out of the RPM script engine,
+because the treecompose model is currently different (no hardlinks
+yet).
+
+NOTE: A *very* important side effect of this is that we now
+require "privileged" containers on hosts without user namespaces,
+and on userns hosts, require `CLONE_NEWUSER` to be exported to the
+container host.
+
+In general though, the previous path of blindly executing scripts as root
+without e.g. `proc` mounted was just bad.
+
+Closes: #429
+Approved by: jlebon
+---
+ src/libpriv/rpmostree-postprocess.c | 48 +++++++++++++++++++++++++++----------
+ 1 file changed, 36 insertions(+), 12 deletions(-)
+
+diff --git a/src/libpriv/rpmostree-postprocess.c b/src/libpriv/rpmostree-postprocess.c
+index 57b8785..17ec151 100644
+--- a/src/libpriv/rpmostree-postprocess.c
++++ b/src/libpriv/rpmostree-postprocess.c
+@@ -27,6 +27,7 @@
+ #include <json-glib/json-glib.h>
+ #include <stdio.h>
+ #include <utime.h>
++#include <err.h>
+ #include <sys/types.h>
+ #include <pwd.h>
+ #include <grp.h>
+@@ -37,6 +38,7 @@
+ #include <gio/gunixoutputstream.h>
+ 
+ #include "rpmostree-postprocess.h"
++#include "rpmostree-bwrap.h"
+ #include "rpmostree-passwd-util.h"
+ #include "rpmostree-rpm-util.h"
+ #include "rpmostree-json-parsing.h"
+@@ -66,21 +68,43 @@ run_sync_in_root_at (int           rootfs_fd,
+                      char        **child_argv,
+                      GError     **error)
+ {
+-  gboolean ret = FALSE;
+-  pid_t child = glnx_libcontainer_run_chroot_at_private (rootfs_fd, binpath, child_argv);
++  const GSpawnFlags bwrap_spawnflags = G_SPAWN_SEARCH_PATH;
++  g_autoptr(GPtrArray) bwrap_argv = NULL;
++
++  bwrap_argv = rpmostree_bwrap_base_argv_new_for_rootfs (rootfs_fd, error);
++  if (!bwrap_argv)
++    return FALSE;
++
++  /* Bind all of the primary toplevel dirs; unlike the script case, treecompose
++   * isn't yet operating on hardlinks, so we can just bind mount things mutably.
++   */
++  rpmostree_ptrarray_append_strdup (bwrap_argv,
++                                    "--bind", "usr", "/usr",
++                                    "--bind", "var", "/var",
++                                    "--bind", "etc", "/etc",
++                                    NULL);
++
++  g_ptr_array_add (bwrap_argv, g_strdup (binpath));
++  /* https://github.com/projectatomic/bubblewrap/issues/91 */
++  { gboolean first = TRUE;
++    for (char **iter = child_argv; iter && *iter; iter++)
++      {
++        if (first)
++          first = FALSE;
++        else
++          g_ptr_array_add (bwrap_argv, g_strdup (*iter));
++      }
++  }
++  g_ptr_array_add (bwrap_argv, NULL);
+ 
+-  if (child == -1)
++  if (!rpmostree_run_sync_fchdir_setup ((char**)bwrap_argv->pdata, bwrap_spawnflags,
++                                        rootfs_fd, error))
+     {
+-      _rpmostree_set_error_from_errno (error, errno);
+-      goto out;
++      g_prefix_error (error, "Executing bwrap: ");
++      return FALSE;
+     }
+-  
+-  if (!_rpmostree_sync_wait_on_pid (child, error))
+-    goto out;
+-  
+-  ret = TRUE;
+- out:
+-  return ret;
++
++  return TRUE;
+ }
+ 
+ static gboolean
+-- 
+2.7.4
+
+
+From 7455e262733bff92a6e64ae08f4ebedb7fb64e3d Mon Sep 17 00:00:00 2001
+From: Colin Walters <walters@verbum.org>
+Date: Fri, 12 Aug 2016 16:53:49 -0400
+Subject: [PATCH 3/3] bwrap: Add a selftest
+
+I want a better error message if the user happens to execute
+inside e.g. a Docker container without sufficient privileges
+for recursive containerization.
+
+Closes: #429
+Approved by: jlebon
+---
+ src/app/rpmostree-compose-builtin-tree.c |  6 ++++++
+ src/libpriv/rpmostree-bwrap.c            | 29 +++++++++++++++++++++++++++++
+ src/libpriv/rpmostree-bwrap.h            |  2 ++
+ 3 files changed, 37 insertions(+)
+
+diff --git a/src/app/rpmostree-compose-builtin-tree.c b/src/app/rpmostree-compose-builtin-tree.c
+index ecdd6bc..5ea1cbe 100644
+--- a/src/app/rpmostree-compose-builtin-tree.c
++++ b/src/app/rpmostree-compose-builtin-tree.c
+@@ -31,6 +31,7 @@
+ 
+ #include "rpmostree-compose-builtins.h"
+ #include "rpmostree-util.h"
++#include "rpmostree-bwrap.h"
+ #include "rpmostree-core.h"
+ #include "rpmostree-json-parsing.h"
+ #include "rpmostree-postprocess.h"
+@@ -629,6 +630,11 @@ rpmostree_compose_builtin_tree (int             argc,
+                    "compose tree must presently be run as uid 0 (root)");
+       goto out;
+     }
++  /* Test whether or not bwrap is going to work - we will fail inside e.g. a Docker
++   * container without --privileged or userns exposed.
++   */
++  if (!rpmostree_bwrap_selftest (error))
++    goto out;
+ 
+   repo_path = g_file_new_for_path (opt_repo);
+   repo = self->repo = ostree_repo_new (repo_path);
+diff --git a/src/libpriv/rpmostree-bwrap.c b/src/libpriv/rpmostree-bwrap.c
+index 29f79d3..bd7c793 100644
+--- a/src/libpriv/rpmostree-bwrap.c
++++ b/src/libpriv/rpmostree-bwrap.c
+@@ -107,3 +107,32 @@ rpmostree_run_sync_fchdir_setup (char **argv_array, GSpawnFlags flags,
+ 
+   return TRUE;
+ }
++
++/* Execute /bin/true inside a bwrap container on the host */
++gboolean
++rpmostree_bwrap_selftest (GError **error)
++{
++  glnx_fd_close int host_root_dfd = -1;
++  g_autoptr(GPtrArray) bwrap_argv = NULL;
++
++  if (!glnx_opendirat (AT_FDCWD, "/", TRUE, &host_root_dfd, error))
++    return FALSE;
++
++  bwrap_argv = rpmostree_bwrap_base_argv_new_for_rootfs (host_root_dfd, error);
++  if (!bwrap_argv)
++    return FALSE;
++
++  rpmostree_ptrarray_append_strdup (bwrap_argv,
++                                    "--ro-bind", "usr", "/usr",
++                                    NULL);
++  g_ptr_array_add (bwrap_argv, g_strdup ("true"));
++  g_ptr_array_add (bwrap_argv, NULL);
++  if (!rpmostree_run_sync_fchdir_setup ((char**)bwrap_argv->pdata, G_SPAWN_SEARCH_PATH,
++                                        host_root_dfd, error))
++    {
++      g_prefix_error (error, "bwrap test failed, see https://github.com/projectatomic/rpm-ostree/pull/429: ");
++      return FALSE;
++    }
++
++  return TRUE;
++}
+diff --git a/src/libpriv/rpmostree-bwrap.h b/src/libpriv/rpmostree-bwrap.h
+index fbf2113..b4bb88c 100644
+--- a/src/libpriv/rpmostree-bwrap.h
++++ b/src/libpriv/rpmostree-bwrap.h
+@@ -30,3 +30,5 @@ void rpmostree_ptrarray_append_strdup (GPtrArray *argv_array, ...) G_GNUC_NULL_T
+ 
+ gboolean rpmostree_run_sync_fchdir_setup (char **argv_array, GSpawnFlags flags,
+                                           int rootfs_fd, GError **error);
++
++gboolean rpmostree_bwrap_selftest (GError **error);
+-- 
+2.7.4
+
