@@ -1,0 +1,34 @@
+From 0fe12fe6a37ee98de5dec70c345d9f0479c47803 Mon Sep 17 00:00:00 2001
+From: Jonathan Lebon <jlebon@redhat.com>
+Date: Wed, 17 Aug 2016 16:33:51 -0400
+Subject: [PATCH] mutate-os-release: skip VERSION_ID
+
+I hit this with librepo subbing out the $releasever with e.g. 7.2016.1
+when trying to pull various URLs. It should be enough for the user to
+see the ostree version in VERSION and PRETTY_NAME. For applications,
+there's OSTREE_VERSION if they need just that.
+
+Closes: #433
+Approved by: cgwalters
+---
+ src/libpriv/rpmostree-postprocess.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/src/libpriv/rpmostree-postprocess.c b/src/libpriv/rpmostree-postprocess.c
+index 17ec151..d0566bd 100644
+--- a/src/libpriv/rpmostree-postprocess.c
++++ b/src/libpriv/rpmostree-postprocess.c
+@@ -1380,8 +1380,9 @@ mutate_os_release (const char    *contents,
+       if (strlen (line) == 0)
+         continue;
+ 
++      /* NB: we don't mutate VERSION_ID because some libraries expect well-known
++       * values there*/
+       if (g_str_has_prefix (line, "VERSION=") || \
+-          g_str_has_prefix (line, "VERSION_ID=") || \
+           g_str_has_prefix (line, "PRETTY_NAME="))
+         {
+           g_autofree char *new_line = NULL;
+-- 
+2.7.4
+
