@@ -1,7 +1,7 @@
 Summary: Client side upgrade program and server side compose tool
 Name: rpm-ostree
 Version: 2016.7
-Release: 3%{?dist}
+Release: 4%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
@@ -51,6 +51,7 @@ Provides: rpm-ostree-client
 %endif
 
 Requires: bubblewrap
+Requires: fuse
 
 %description
 This tool binds together the world of RPM packages with the OSTree
@@ -123,6 +124,9 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Thu Sep 01 2016 walters@redhat.com - 2016.7-4
+- Add requires on fuse https://github.com/projectatomic/rpm-ostree/issues/443
+
 * Wed Aug 31 2016 Colin Walters <walters@verbum.org> - 2016.7-3
 - Backport patch for running inside mock
 
