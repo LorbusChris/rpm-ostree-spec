@@ -5,8 +5,6 @@ Release: 1%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
-Patch0: 0001-bwrap-compose-Add-a-workaround-for-Fedora-s-use-of-r.patch
-Patch1: 0001-mutate-os-release-skip-VERSION_ID.patch
 License: LGPLv2+
 URL: https://github.com/projectatomic/rpm-ostree
 # We always run autogen.sh
