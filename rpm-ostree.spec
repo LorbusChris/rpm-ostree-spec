@@ -1,10 +1,11 @@
 Summary: Client side upgrade program and server side compose tool
 Name: rpm-ostree
 Version: 2016.12
-Release: 2%{?dist}
+Release: 4%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
+Patch0: 0001-Fix-install-langs-support.patch
 License: LGPLv2+
 URL: https://github.com/projectatomic/rpm-ostree
 # We always run autogen.sh
@@ -122,6 +123,9 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Sat Nov 26 2016 walters@redhat.com - 2016.12-4
+- Backport patch to fix install-langs
+
 * Tue Nov 15 2016 walters@redhat.com - 2016.11-2
 - New upstream version
 
