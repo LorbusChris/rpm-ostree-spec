@@ -1,7 +1,7 @@
 Summary: Client side upgrade program and server side compose tool
 Name: rpm-ostree
 Version: 2017.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
@@ -27,6 +27,8 @@ BuildRequires: libattr-devel
 
 # We currently interact directly with librepo
 BuildRequires: pkgconfig(librepo)
+
+Patch0: 0001-Back-out-network-namespace-usage.patch
 
 # libhif bundling
 # We're using RPATH to pick up our bundled version
@@ -122,6 +124,9 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Fri Jan 27 2017 Colin Walters <walters@verbum.org> - 2017.1-3
+- Back out netns usage for now for https://pagure.io/releng/issue/6602
+
 * Sun Jan 22 2017 Colin Walters <walters@verbum.org> - 2017.1-2
 - New upstream version
 
