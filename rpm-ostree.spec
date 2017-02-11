@@ -1,7 +1,7 @@
 Summary: Client side upgrade program and server side compose tool
 Name: rpm-ostree
 Version: 2017.1
-Release: 3%{?dist}
+Release: 4%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
@@ -124,6 +124,9 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Sat Feb 11 2017 Fedora Release Engineering <releng@fedoraproject.org> - 2017.1-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
+
 * Fri Jan 27 2017 Colin Walters <walters@verbum.org> - 2017.1-3
 - Back out netns usage for now for https://pagure.io/releng/issue/6602
 
