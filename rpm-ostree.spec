@@ -1,7 +1,7 @@
 Summary: Client side upgrade program and server side compose tool
 Name: rpm-ostree
-Version: 2017.1
-Release: 4%{?dist}
+Version: 2017.2
+Release: 2%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
@@ -27,8 +27,6 @@ BuildRequires: libattr-devel
 
 # We currently interact directly with librepo
 BuildRequires: pkgconfig(librepo)
-
-Patch0: 0001-Back-out-network-namespace-usage.patch
 
 # libhif bundling
 # We're using RPATH to pick up our bundled version
@@ -124,6 +122,9 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Wed Feb 15 2017 Colin Walters <walters@verbum.org> - 2017.2-2
+- New upstream version
+
 * Sat Feb 11 2017 Fedora Release Engineering <releng@fedoraproject.org> - 2017.1-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
 
