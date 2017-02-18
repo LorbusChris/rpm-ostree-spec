@@ -1,7 +1,7 @@
 Summary: Client side upgrade program and server side compose tool
 Name: rpm-ostree
 Version: 2017.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
@@ -27,6 +27,8 @@ BuildRequires: libattr-devel
 
 # We currently interact directly with librepo
 BuildRequires: pkgconfig(librepo)
+
+Patch0: 0001-build-Deal-with-gperf-3.1-changing-to-size_t.patch
 
 # libhif bundling
 # We're using RPATH to pick up our bundled version
@@ -122,6 +124,10 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Sat Feb 18 2017 Colin Walters <walters@verbum.org> - 2017.2-3
+- Add patch for gperf 3.1 compatibility
+  Resolves: #1424268
+
 * Wed Feb 15 2017 Colin Walters <walters@verbum.org> - 2017.2-2
 - New upstream version
 
