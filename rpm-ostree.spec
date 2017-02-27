@@ -1,7 +1,7 @@
 Summary: Client side upgrade program and server side compose tool
 Name: rpm-ostree
 Version: 2017.2
-Release: 3%{?dist}
+Release: 4%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
@@ -129,6 +129,9 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Mon Feb 27 2017 Colin Walters <walters@verbum.org> - 2017.2-4
+- Add requires on ostree
+
 * Sat Feb 18 2017 Colin Walters <walters@verbum.org> - 2017.2-3
 - Add patch for gperf 3.1 compatibility
   Resolves: #1424268
