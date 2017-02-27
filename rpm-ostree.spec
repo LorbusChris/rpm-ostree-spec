@@ -50,6 +50,11 @@ BuildRequires: pkgconfig(libsolv)
 Provides: rpm-ostree-client
 %endif
 
+# For now...see https://github.com/projectatomic/rpm-ostree/pull/637
+# and https://github.com/fedora-infra/fedmsg-atomic-composer/pull/17
+# etc.  We'll drop this dependency at some point in the future when
+# rpm-ostree wraps more of ostree (such as `ostree admin unlock` etc.)
+Requires: ostree
 Requires: bubblewrap
 Requires: fuse
 
