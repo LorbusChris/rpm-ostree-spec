@@ -1,7 +1,7 @@
 Summary: Client side upgrade program and server side compose tool
 Name: rpm-ostree
-Version: 2017.2
-Release: 5%{?dist}
+Version: 2017.3
+Release: 1%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
@@ -28,12 +28,9 @@ BuildRequires: libattr-devel
 # We currently interact directly with librepo
 BuildRequires: pkgconfig(librepo)
 
-Patch0: 0001-build-Deal-with-gperf-3.1-changing-to-size_t.patch
-Patch1: 0001-build-Depend-on-ostree-2017.2-drop-check-for-gpg-sym.patch
-
-# libhif bundling
+# libdnf bundling
 # We're using RPATH to pick up our bundled version
-%global __requires_exclude ^libhif[.]so[.].*$
+%global __requires_exclude ^libdnf[.]so[.].*$
 
 BuildRequires: cmake
 BuildRequires: pkgconfig(expat)
@@ -130,6 +127,11 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Mon Mar 06 2017 Colin Walters <walters@verbum.org> - 2017.3-1
+- New upstream version
+  Fixes: CVE-2017-2623
+  Resolves: #1422157
+
 * Fri Mar 03 2017 Colin Walters <walters@verbum.org> - 2017.2-5
 - Add patch to bump requires for ostree
 
