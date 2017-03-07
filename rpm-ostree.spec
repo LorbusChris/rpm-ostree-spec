@@ -16,8 +16,7 @@ BuildRequires: gperf
 BuildRequires: gnome-common
 BuildRequires: gobject-introspection
 # Core requirements
-BuildRequires: pkgconfig(ostree-1) >= 2015.1
-BuildRequires: pkgconfig(libgsystem)
+BuildRequires: pkgconfig(ostree-1) >= 2017.2
 BuildRequires: pkgconfig(json-glib-1.0)
 BuildRequires: pkgconfig(rpm)
 BuildRequires: pkgconfig(libarchive)
