@@ -1,4 +1,4 @@
-Summary: Client side upgrade program and server side compose tool
+Summary: Hybrid image/package system
 Name: rpm-ostree
 Version: 2017.3
 Release: 1%{?dist}
@@ -56,9 +56,12 @@ Requires: bubblewrap
 Requires: fuse
 
 %description
-This tool binds together the world of RPM packages with the OSTree
-model of bootable filesystem trees.  It provides commands usable both
-on client systems as well as server-side composes.
+rpm-ostree is a hybrid image/package system.  It supports
+"composing" packages on a build server into an OSTree repository,
+which can then be replicated by client systems with atomic upgrades.
+Additionally, unlike many "pure" image systems, with rpm-ostree
+each client system can layer on additional packages, providing
+a "best of both worlds" approach.
 
 %package devel
 Summary: Development headers for %{name}
