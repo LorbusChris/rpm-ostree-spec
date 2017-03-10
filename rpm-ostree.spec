@@ -8,8 +8,9 @@ Source0: rpm-ostree-%{version}.tar.xz
 License: LGPLv2+
 URL: https://github.com/projectatomic/rpm-ostree
 
-Patch0: 0001-bwrap-Don-t-use-unshare-net-in-nspawn-by-default.patch
-Patch1: 0001-status-always-include-the-packages-entries.patch
+# git checkout 2017.3-maint
+# git format-patch --stdout v2017.3..
+Patch0: 2017.3-maint.path
 
 # We always run autogen.sh
 BuildRequires: autoconf automake libtool git

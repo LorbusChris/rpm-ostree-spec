@@ -1,0 +1,233 @@
+From cea2812fc01f8e37a6cdee3abcff511f2554703a Mon Sep 17 00:00:00 2001
+From: Colin Walters <walters@verbum.org>
+Date: Mon, 6 Mar 2017 14:17:06 -0500
+Subject: [PATCH 1/3] Allow and start using C99 declaration-after-statement
+
+The equivalent of https://github.com/ostreedev/ostree/pull/718
+but for this codebase.
+
+I just picked one example at random, there's plenty of others, but I don't want
+to do any kind of tree-wide conversion since we have lots of outstanding
+patches.
+
+Closes: #664
+Approved by: jlebon
+---
+ configure.ac                 |  1 -
+ src/libpriv/rpmostree-util.c | 15 +++++----------
+ 2 files changed, 5 insertions(+), 11 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index fc7d43f..c9a07b6 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -44,7 +44,6 @@ CC_CHECK_FLAGS_APPEND([WARN_CFLAGS], [CFLAGS], [\
+         -Werror=incompatible-pointer-types \
+         -Werror=misleading-indentation \
+ 	-Werror=missing-include-dirs -Werror=aggregate-return \
+-	-Werror=declaration-after-statement \
+ ])
+ AC_SUBST(WARN_CFLAGS)
+ 
+diff --git a/src/libpriv/rpmostree-util.c b/src/libpriv/rpmostree-util.c
+index b0aaec7..0f994e9 100644
+--- a/src/libpriv/rpmostree-util.c
++++ b/src/libpriv/rpmostree-util.c
+@@ -394,17 +394,14 @@ rpmostree_split_path_ptrarray_validate (const char *path,
+                                         GPtrArray  **out_components,
+                                         GError     **error)
+ {
+-  gboolean ret = FALSE;
+-  g_autoptr(GPtrArray) ret_components = NULL;
+-
+   if (strlen (path) > PATH_MAX)
+     {
+       g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+                    "Path '%s' is too long", path);
+-      goto out;
++      return FALSE;
+     }
+ 
+-  ret_components = g_ptr_array_new_with_free_func (g_free);
++  g_autoptr(GPtrArray) ret_components = g_ptr_array_new_with_free_func (g_free);
+ 
+   do
+     {
+@@ -426,23 +423,21 @@ rpmostree_split_path_ptrarray_validate (const char *path,
+         {
+           g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+                        "Invalid empty component in path '%s'", path);
+-          goto out;
++          return FALSE;
+         }
+       if (g_str_equal (component, ".") ||
+           g_str_equal (component, ".."))
+         {
+           g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+                        "Invalid special element '.' or '..' in path %s", path);
+-          goto out;
++          return FALSE;
+         }
+ 
+       g_ptr_array_add (ret_components, (char*)g_steal_pointer (&component));
+     } while (path && *path);
+ 
+-  ret = TRUE;
+   *out_components = g_steal_pointer (&ret_components);
+- out:
+-  return ret;
++  return TRUE;
+ }
+ 
+ /* Replace every occurrence of @old in @buf with @new. */
+-- 
+2.9.3
+
+
+From 94e386fc86e4208dda03090f543f3e0f415d32e4 Mon Sep 17 00:00:00 2001
+From: Jonathan Lebon <jlebon@redhat.com>
+Date: Thu, 9 Mar 2017 16:39:03 -0500
+Subject: [PATCH 2/3] status: always include the packages entries
+
+Pull #646 introduced a subtle regression: we went from always including
+a "packages" entry to only including it if there are packages present.
+Albeit it's easy to guard against, though to be nice, let's make it
+easier for consumers by always including it.
+
+Reported-by: Micah Abbott <miabbott@redhat.com>
+
+Closes: #670
+Approved by: cgwalters
+---
+ src/daemon/rpmostreed-deployment-utils.c | 15 +++++++++------
+ tests/vmcheck/test-layering-basic.sh     |  6 ++++++
+ 2 files changed, 15 insertions(+), 6 deletions(-)
+
+diff --git a/src/daemon/rpmostreed-deployment-utils.c b/src/daemon/rpmostreed-deployment-utils.c
+index 42a990a..6961a0d 100644
+--- a/src/daemon/rpmostreed-deployment-utils.c
++++ b/src/daemon/rpmostreed-deployment-utils.c
+@@ -236,15 +236,18 @@ rpmostreed_deployment_generate_variant (OstreeDeployment *deployment,
+     }
+ 
+   g_variant_dict_insert (&dict, "origin", "s", refspec);
+-  if (g_hash_table_size (rpmostree_origin_get_packages (origin)) > 0)
+-    {
+-      g_autofree char **pkgs =
+-        (char**)g_hash_table_get_keys_as_array (rpmostree_origin_get_packages (origin), NULL);
+-      g_variant_dict_insert (&dict, "requested-packages", "^as", pkgs);
+-    }
++
++  g_autofree char **requested_pkgs =
++    (char**)g_hash_table_get_keys_as_array (rpmostree_origin_get_packages (origin), NULL);
++  g_variant_dict_insert (&dict, "requested-packages", "^as", requested_pkgs);
+ 
+   if (is_layered && g_strv_length (layered_pkgs) > 0)
+     g_variant_dict_insert (&dict, "packages", "^as", layered_pkgs);
++  else
++    {
++      const char *const p[] = { NULL };
++      g_variant_dict_insert (&dict, "packages", "^as", p);
++    }
+ 
+   if (sigs != NULL)
+     g_variant_dict_insert_value (&dict, "signatures", sigs);
+diff --git a/tests/vmcheck/test-layering-basic.sh b/tests/vmcheck/test-layering-basic.sh
+index 79e9562..ce10201 100755
+--- a/tests/vmcheck/test-layering-basic.sh
++++ b/tests/vmcheck/test-layering-basic.sh
+@@ -37,6 +37,12 @@ vm_assert_status_jq \
+   '.deployments[0]["base-checksum"]|not' \
+   '.deployments[0]["pending-base-checksum"]|not'
+ 
++# make sure that package-related entries are always present,
++# even when they're empty
++vm_assert_status_jq \
++  '.deployments[0]["packages"]' \
++  '.deployments[0]["requested-packages"]'
++
+ # Be sure an unprivileged user exists
+ vm_cmd getent passwd bin
+ if vm_cmd "runuser -u bin rpm-ostree pkg-add foo-1.0"; then
+-- 
+2.9.3
+
+
+From 8df6672500c3404847b0e42e94dba076af4f5eb6 Mon Sep 17 00:00:00 2001
+From: Colin Walters <walters@verbum.org>
+Date: Fri, 10 Mar 2017 09:48:03 -0500
+Subject: [PATCH 3/3] bwrap: Don't use --unshare-net in nspawn by default
+
+This will fix rpm-ostree-in-mock-in-koji. The drawback is minor: post scripts
+will have network access. But we're going to be testing the no-network case in
+our Docker-based builds, so that's fine.
+---
+ scripts/bwrap-script-shell.sh |  6 +++++-
+ src/libpriv/rpmostree-bwrap.c | 20 +++++++++++++++++++-
+ 2 files changed, 24 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/bwrap-script-shell.sh b/scripts/bwrap-script-shell.sh
+index 98cadb6..e368869 100755
+--- a/scripts/bwrap-script-shell.sh
++++ b/scripts/bwrap-script-shell.sh
+@@ -6,9 +6,13 @@ shift
+ cd ${rootfs}
+ # ⚠⚠⚠ If you change this, also update src/libpriv/rpmostree-scripts.c ⚠⚠⚠
+ BWRAP_ARGV="--dev /dev --proc /proc --dir /tmp --chdir / \
+-     --unshare-pid --unshare-net --unshare-uts \
++     --unshare-pid --unshare-uts \
+      --unshare-ipc --unshare-cgroup-try \
+ "
++if ! test "${container:-}" = "systemd-nspawn"; then
++    BWRAP_ARGV="$BWRAP_ARGV --unshare-net"
++fi
++
+ for src in /sys/{block,bus,class,dev}; do
+     BWRAP_ARGV="$BWRAP_ARGV --ro-bind $src $src"
+ done
+diff --git a/src/libpriv/rpmostree-bwrap.c b/src/libpriv/rpmostree-bwrap.c
+index 9d40059..5258439 100644
+--- a/src/libpriv/rpmostree-bwrap.c
++++ b/src/libpriv/rpmostree-bwrap.c
+@@ -177,6 +177,22 @@ setup_rofiles_usr (RpmOstreeBwrap *bwrap,
+   return ret;
+ }
+ 
++/* nspawn by default doesn't give us CAP_NET_ADMIN; see
++ * https://pagure.io/releng/issue/6602#comment-71214
++ * https://pagure.io/koji/pull-request/344#comment-21060
++ *
++ * Theoretically we should do capable(CAP_NET_ADMIN)
++ * but that's a lot of ugly code, and the only known
++ * place we hit this right now is nspawn.  Plus
++ * we want to use userns down the line anyways where
++ * we'll regain CAP_NET_ADMIN.
++ */
++static gboolean
++running_in_nspawn (void)
++{
++  return g_strcmp0 (getenv ("container"), "systemd-nspawn") == 0;
++}
++
+ RpmOstreeBwrap *
+ rpmostree_bwrap_new (int rootfs_fd,
+                      RpmOstreeBwrapMutability mutable,
+@@ -209,12 +225,14 @@ rpmostree_bwrap_new (int rootfs_fd,
+                                       * but it may need some mapping work.
+                                       */
+                                      "--unshare-pid",
+-                                     "--unshare-net",
+                                      "--unshare-uts",
+                                      "--unshare-ipc",
+                                      "--unshare-cgroup-try",
+                                      NULL);
+ 
++  if (!running_in_nspawn ())
++    rpmostree_bwrap_append_bwrap_argv (ret, "--unshare-net", NULL);
++
+   for (guint i = 0; i < G_N_ELEMENTS (usr_links); i++)
+     {
+       const char *subdir = usr_links[i];
+-- 
+2.9.3
+
