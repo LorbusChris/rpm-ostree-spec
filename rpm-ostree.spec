@@ -1,12 +1,16 @@
 Summary: Hybrid image/package system
 Name: rpm-ostree
 Version: 2017.3
-Release: 1%{?dist}
+Release: 2%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
 License: LGPLv2+
 URL: https://github.com/projectatomic/rpm-ostree
+
+Patch0: 0001-bwrap-Don-t-use-unshare-net-in-nspawn-by-default.patch
+Patch1: 0001-status-always-include-the-packages-entries.patch
+
 # We always run autogen.sh
 BuildRequires: autoconf automake libtool git
 # For docs
@@ -129,6 +133,9 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Fri Mar 10 2017 Colin Walters <walters@verbum.org> - 2017.3-2
+- Backport patch for running in koji
+
 * Mon Mar 06 2017 Colin Walters <walters@verbum.org> - 2017.3-1
 - New upstream version
   Fixes: CVE-2017-2623
