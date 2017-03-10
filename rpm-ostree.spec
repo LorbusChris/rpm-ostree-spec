@@ -10,7 +10,7 @@ URL: https://github.com/projectatomic/rpm-ostree
 
 # git checkout 2017.3-maint
 # git format-patch --stdout v2017.3..
-Patch0: 2017.3-maint.path
+Patch0: 2017.3-maint.patch
 
 # We always run autogen.sh
 BuildRequires: autoconf automake libtool git
