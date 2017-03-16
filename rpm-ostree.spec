@@ -1,7 +1,7 @@
 Summary: Hybrid image/package system
 Name: rpm-ostree
 Version: 2017.3
-Release: 2%{?dist}
+Release: 3%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
@@ -134,6 +134,9 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Thu Mar 16 2017 Colin Walters <walters@verbum.org> - 2017.3-3
+- Add patch to fix f26 altfiles
+
 * Fri Mar 10 2017 Colin Walters <walters@verbum.org> - 2017.3-2
 - Backport patch for running in koji
 
