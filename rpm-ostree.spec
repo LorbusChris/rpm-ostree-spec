@@ -1,7 +1,7 @@
 Summary: Hybrid image/package system
 Name: rpm-ostree
 Version: 2017.3
-Release: 3%{?dist}
+Release: 4%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
@@ -134,6 +134,10 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Fri Apr 07 2017 Colin Walters <walters@verbum.org> - 2017.3-4
+- Backport patch to add API devices for running on CentOS 7
+  https://github.com/projectatomic/rpm-ostree/issues/727
+
 * Thu Mar 16 2017 Colin Walters <walters@verbum.org> - 2017.3-3
 - Add patch to fix f26 altfiles
 
