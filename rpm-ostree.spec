@@ -1,16 +1,12 @@
 Summary: Hybrid image/package system
 Name: rpm-ostree
-Version: 2017.3
-Release: 4%{?dist}
+Version: 2017.4
+Release: 1%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
 License: LGPLv2+
 URL: https://github.com/projectatomic/rpm-ostree
-
-# git checkout 2017.3-maint
-# git format-patch --stdout v2017.3..
-Patch0: 2017.3-maint.patch
 
 # We always run autogen.sh
 BuildRequires: autoconf automake libtool git
@@ -134,6 +130,9 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Thu Apr 13 2017 Jonathan Lebon <jlebon@redhat.com> - 2017.4-1
+- New upstream version.
+
 * Fri Apr 07 2017 Colin Walters <walters@verbum.org> - 2017.3-4
 - Backport patch to add API devices for running on CentOS 7
   https://github.com/projectatomic/rpm-ostree/issues/727
