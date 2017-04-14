@@ -1,0 +1,59 @@
+From b21b08c7706eaf80b979094e9c9a080e090170e6 Mon Sep 17 00:00:00 2001
+From: Colin Walters <walters@verbum.org>
+Date: Thu, 13 Apr 2017 17:07:53 -0400
+Subject: [PATCH] app: Only call RegisterClient() if we're root
+
+Otherwise we can't do e.g. `rpm-ostree status`.
+
+Closes: https://github.com/projectatomic/rpm-ostree/issues/738
+
+Closes: #739
+Approved by: dustymabe
+---
+ src/app/rpmostree-dbus-helpers.c     | 15 ++++++++++-----
+ tests/vmcheck/test-layering-basic.sh |  3 +++
+ 2 files changed, 13 insertions(+), 5 deletions(-)
+
+diff --git a/src/app/rpmostree-dbus-helpers.c b/src/app/rpmostree-dbus-helpers.c
+index 32c2798..8dfeb5d 100644
+--- a/src/app/rpmostree-dbus-helpers.c
++++ b/src/app/rpmostree-dbus-helpers.c
+@@ -153,11 +153,16 @@ rpmostree_load_sysroot (gchar *sysroot,
+   if (sysroot_proxy == NULL)
+     return FALSE;
+ 
+-  /* This tells the daemon not to auto-exit as long as we are alive */
+-  if (!rpmostree_sysroot_call_register_client_sync (sysroot_proxy,
+-                                                    g_variant_builder_end (options_builder),
+-                                                    cancellable, error))
+-    return FALSE;
++  /* This tells the daemon not to auto-exit as long as we are alive; but we can
++   * only do this as root.
++   */
++  if (getuid () == 0)
++    {
++      if (!rpmostree_sysroot_call_register_client_sync (sysroot_proxy,
++                                                        g_variant_builder_end (options_builder),
++                                                        cancellable, error))
++        return FALSE;
++    }
+ 
+   *out_sysroot_proxy = g_steal_pointer (&sysroot_proxy);
+   *out_peer_pid = peer_pid; peer_pid = 0;
+diff --git a/tests/vmcheck/test-layering-basic.sh b/tests/vmcheck/test-layering-basic.sh
+index f57d4f6..e116e66 100755
+--- a/tests/vmcheck/test-layering-basic.sh
++++ b/tests/vmcheck/test-layering-basic.sh
+@@ -49,6 +49,9 @@ if vm_cmd "runuser -u bin rpm-ostree pkg-add foo-1.0"; then
+     assert_not_reached "Was able to install a package as non-root!"
+ fi
+ 
++# Assert that we can do status as non-root
++vm_cmd "runuser -u bin rpm-ostree status" >/dev/null
++
+ # Be sure an unprivileged user exists
+ if vm_rpmostree install test-opt-1.0 2>err.txt; then
+     assert_not_reached "Was able to install a package in /opt"
+-- 
+2.12.2
+
