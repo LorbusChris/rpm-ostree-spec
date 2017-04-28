@@ -1,14 +1,12 @@
 Summary: Hybrid image/package system
 Name: rpm-ostree
-Version: 2017.4
-Release: 2%{?dist}
+Version: 2017.5
+Release: 1%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
 License: LGPLv2+
 URL: https://github.com/projectatomic/rpm-ostree
-
-Patch0: 0001-app-Only-call-RegisterClient-if-we-re-root.patch
 
 # We always run autogen.sh
 BuildRequires: autoconf automake libtool git
@@ -132,6 +130,9 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Fri Apr 28 2017 Jonathan Lebon <jlebon@redhat.com> - 2017.5-1
+- New upstream version
+
 * Fri Apr 14 2017 Jonathan Lebon <jlebon@redhat.com> - 2017.4-2
 - Backport patch to allow unprivileged `rpm-ostree status`
 
