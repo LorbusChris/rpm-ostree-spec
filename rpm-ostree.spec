@@ -1,7 +1,7 @@
 Summary: Hybrid image/package system
 Name: rpm-ostree
-Version: 2017.5
-Release: 2%{?dist}
+Version: 2017.6
+Release: 1%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
@@ -130,6 +130,9 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Fri May 26 2017 Jonathan Lebon <jlebon@redhat.com> - 2017.6-1
+- New upstream version
+
 * Fri Apr 28 2017 Jonathan Lebon <jlebon@redhat.com> - 2017.5-2
 - Bump libostree dep and rebuild in override
 
