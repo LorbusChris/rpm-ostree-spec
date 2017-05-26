@@ -130,7 +130,7 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
-* Fri Apr 28 2017 Jonathan Lebon <jlebon@redhat.com> - 2017.6-2
+* Fri May 26 2017 Jonathan Lebon <jlebon@redhat.com> - 2017.6-2
 - Bump libostree dep
 
 * Fri May 26 2017 Jonathan Lebon <jlebon@redhat.com> - 2017.6-1
