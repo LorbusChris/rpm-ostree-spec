@@ -1,7 +1,7 @@
 Summary: Hybrid image/package system
 Name: rpm-ostree
 Version: 2017.6
-Release: 2%{?dist}
+Release: 3%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
