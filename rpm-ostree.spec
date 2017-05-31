@@ -32,6 +32,9 @@ BuildRequires: pkgconfig(librepo)
 # We're using RPATH to pick up our bundled version
 %global __requires_exclude ^libdnf[.]so[.].*$
 
+# Our bundled libdnf.so.1 is for us only
+%global __provides_exclude_from ^%{_libdir}/%{name}/.*$
+
 BuildRequires: cmake
 BuildRequires: pkgconfig(expat)
 BuildRequires: pkgconfig(check)
@@ -130,6 +133,9 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Wed May 31 2017 Jonathan Lebon <jlebon@redhat.com> - 2017.6-3
+- Make sure we don't auto-provide libdnf (RHBZ#1457089)
+
 * Fri May 26 2017 Jonathan Lebon <jlebon@redhat.com> - 2017.6-2
 - Bump libostree dep
 
