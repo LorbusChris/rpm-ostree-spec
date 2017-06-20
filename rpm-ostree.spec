@@ -18,6 +18,7 @@ BuildRequires: gnome-common
 BuildRequires: gobject-introspection
 # Core requirements
 BuildRequires: pkgconfig(ostree-1) >= 2017.6
+BuildRequires: pkgconfig(polkit-gobject-1)
 BuildRequires: pkgconfig(json-glib-1.0)
 BuildRequires: pkgconfig(rpm)
 BuildRequires: pkgconfig(libarchive)
