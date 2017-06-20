@@ -120,6 +120,7 @@ python autofiles.py > files \
   '%{_sysconfdir}/dbus-1/system.d/*' \
   '%{_prefix}/lib/systemd/system/*' \
   '%{_libexecdir}/rpm-ostree*' \
+  '%{_datadir}/polkit-1/actions/*.policy' \
   '%{_datadir}/dbus-1/system-services'
 python autofiles.py > files.devel \
   '%{_libdir}/lib*.so' \
