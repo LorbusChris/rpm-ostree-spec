@@ -125,6 +125,7 @@ python autofiles.py > files \
 python autofiles.py > files.devel \
   '%{_libdir}/lib*.so' \
   '%{_includedir}/*' \
+  '%{_datadir}/dbus-1/interfaces/org.projectatomic.rpmostree1.xml' \
   '%{_libdir}/pkgconfig/*' \
   '%{_datadir}/gtk-doc/html/*' \
   '%{_datadir}/gir-1.0/*-1.0.gir'
