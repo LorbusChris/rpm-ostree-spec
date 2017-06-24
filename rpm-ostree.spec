@@ -1,7 +1,7 @@
 Summary: Hybrid image/package system
 Name: rpm-ostree
-Version: 2017.6
-Release: 3%{?dist}
+Version: 2017.6.67.g417a3d8
+Release: 4%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
@@ -136,6 +136,9 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Sat Jun 24 2017 Colin Walters <walters@verbum.org>
+- Update to git snapshot to help debug compose failure
+
 * Wed May 31 2017 Jonathan Lebon <jlebon@redhat.com> - 2017.6-3
 - Make sure we don't auto-provide libdnf (RHBZ#1457089)
 
