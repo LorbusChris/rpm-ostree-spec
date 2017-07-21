@@ -1,7 +1,7 @@
 Summary: Hybrid image/package system
 Name: rpm-ostree
 Version: 2017.7
-Release: 1%{?dist}
+Release: 2%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
@@ -15,7 +15,7 @@ BuildRequires: chrpath
 BuildRequires: gtk-doc
 BuildRequires: gperf
 BuildRequires: gnome-common
-BuildRequires: gobject-introspection
+BuildRequires: /usr/bin/g-ir-scanner
 # Core requirements
 BuildRequires: pkgconfig(ostree-1) >= 2017.6
 BuildRequires: pkgconfig(polkit-gobject-1)
@@ -68,13 +68,22 @@ Additionally, unlike many "pure" image systems, with rpm-ostree
 each client system can layer on additional packages, providing
 a "best of both worlds" approach.
 
-%package devel
+%package -n librpmostree
+Summary: Shared library for rpm-ostree
+Group: Development/Libraries
+
+%description -n librpmostree
+The librpmostree package includes the shared library for %{name}.
+
+# Renamed to librpmostree in 2017.7-2
+%package -n librpmostree-devel
 Summary: Development headers for %{name}
 Group: Development/Libraries
-Requires: %{name} = %{version}-%{release}
+Requires: librpmostree = %{version}-%{release}
+Obsoletes: %{name}-devel < 2017.7-2
 
-%description devel
-The %{name}-devel package includes the header files for the %{name} library.
+%description -n librpmostree-devel
+The librpmostree-devel package includes the header files for librpmostree.
 
 %prep
 %autosetup -Sgit -n %{name}-%{version}
@@ -114,14 +123,17 @@ EOF
 python autofiles.py > files \
   '%{_bindir}/*' \
   '%{_libdir}/%{name}' \
-  '%{_libdir}/*.so.*' \
   '%{_mandir}/man*/*' \
-  '%{_libdir}/girepository-1.0/*.typelib' \
   '%{_sysconfdir}/dbus-1/system.d/*' \
   '%{_prefix}/lib/systemd/system/*' \
   '%{_libexecdir}/rpm-ostree*' \
   '%{_datadir}/polkit-1/actions/*.policy' \
   '%{_datadir}/dbus-1/system-services'
+
+python autofiles.py > files.lib \
+  '%{_libdir}/*.so.*' \
+  '%{_libdir}/girepository-1.0/*.typelib'
+
 python autofiles.py > files.devel \
   '%{_libdir}/lib*.so' \
   '%{_includedir}/*' \
@@ -133,9 +145,18 @@ python autofiles.py > files.devel \
 %files -f files
 %doc COPYING README.md
 
-%files devel -f files.devel
+%files -n librpmostree -f files.lib
+
+%files -n librpmostree-devel -f files.devel
 
 %changelog
+* Fri Jul 21 2017 Colin Walters <walters@verbum.org> - 2017.7-2
+- Enable introspection, rename shared lib to librpmostree
+  Due to an oversight, we were not actually building with introspection.
+  Fix that.  And while we are here, split out a shared library package,
+  so that e.g. containers can do `from gi.repository import RpmOstree`
+  without dragging in the systemd service, etc.
+
 * Mon Jul 10 2017 Jonathan Lebon <jlebon@redhat.com> - 2017.7-1
 - New upstream version
 
