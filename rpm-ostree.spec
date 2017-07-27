@@ -1,7 +1,7 @@
 Summary: Hybrid image/package system
 Name: rpm-ostree
 Version: 2017.7
-Release: 3%{?dist}
+Release: 4%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
@@ -148,6 +148,9 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Thu Jul 27 2017 Fedora Release Engineering <releng@fedoraproject.org> - 2017.7-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Mass_Rebuild
+
 * Fri Jul 21 2017 Jonathan Lebon <jlebon@redhat.com> - 2017.7-3
 - Tweak new pkg name to rpm-ostree-libs to be more consistent with the main
   package name and ostree's ostree-libs.
