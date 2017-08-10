@@ -1,7 +1,7 @@
 Summary: Hybrid image/package system
 Name: rpm-ostree
 Version: 2017.7
-Release: 6%{?dist}
+Release: 7%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
@@ -148,6 +148,9 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Thu Aug 10 2017 Igor Gnatenko <ignatenko@redhat.com> - 2017.7-7
+- Rebuilt for RPM soname bump
+
 * Thu Aug 10 2017 Igor Gnatenko <ignatenko@redhat.com> - 2017.7-6
 - Rebuilt for RPM soname bump
 
