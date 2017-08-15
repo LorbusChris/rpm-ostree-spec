@@ -1,0 +1,99 @@
+---
+- hosts: localhost
+  tags:
+    - atomic
+  tasks:
+
+    # XXX: move to standard-test-roles, e.g. standard-test-get-source
+    - name: install koji
+      package: name={{item}} state=present # XXX: state=latest
+      with_items:
+        - koji
+        - rpm-build
+
+    - name: provision VM
+      qemu_provision:
+        subjects: "{{subjects}}"
+        log: "{{artifacts}}/machine.log"
+      register: qemu
+
+    - set_fact:
+        vmssh: ssh -F {{qemu.statedir}}/ssh-config vmcheck
+
+    - block:
+        - name: get source rpm from environment
+          command: "{{vmssh}} rpm -q rpm-ostree --qf '%{SOURCERPM}'"
+          register: srpm
+
+        - name: create temporary source dir
+          tempfile: state=directory
+          register: tmpd
+
+        # XXX: this approach is probably going to break apart once we start
+        # running tests per dist-git PR (since they'll probably not be built in
+        # koji anymore)
+        - name: download source rpm
+          command: koji download-build --rpm {{srpm.stdout}}
+          args:
+            chdir: "{{tmpd.path}}"
+
+        - set_fact:
+            srpmpath: "{{tmpd.path}}/{{srpm.stdout}}"
+
+        - name: extract source rpm
+          command: >
+            rpmbuild --define "_srcrpmdir {{tmpd.path}}"
+                     --define "_buildrootdir {{tmpd.path}}"
+                     --define "_rpmdir {{tmpd.path}}"
+                     --define "_specdir {{tmpd.path}}"
+                     --define "_sourcedir {{tmpd.path}}"
+                     --define "_builddir {{tmpd.path}}"
+                     -rp {{srpmpath}}
+
+        # XXX: this should be made a param to the role and kept in sync with %setup
+        # -n $DIR. here we just assume the default name in case -n is not used
+        - name: construct buildsubdir from rpmdb
+          command: rpm -qp {{srpmpath}} --qf '{{tmpd.path}}/%{NAME}-%{VERSION}'
+          register: buildsubdir
+
+        - name: import ssh-config
+          command: cp {{qemu.statedir}}/ssh-config {{buildsubdir.stdout}}
+
+        # XXX: need to upstream this
+        - name: create and rebase onto vmcheck
+          command: "{{vmssh}} rpm-ostree status --json"
+          register: status
+        - set_fact:
+            status_json: "{{ status.stdout | from_json }}"
+        - command: "{{vmssh}} ostree refs {{ status_json['deployments'][0]['origin'] }} --create vmcheck"
+        - command: "{{vmssh}} rpm-ostree rebase :vmcheck"
+        # XXX: use ans_reboot.yml from a-h-t
+        - shell: "{{vmssh}} shutdown -r now"
+          ignore_errors: true
+
+        - name: run vmcheck
+          command: tests/vmcheck/multitest.py vmcheck
+          # XXX: consider making vmcheck become an installed test
+          environment:
+            VMTESTS: 1
+            SKIP_VMOVERLAY: 1
+            TESTS: basic layering-basic
+            topsrcdir: "{{buildsubdir.stdout}}"
+            commondir: "{{buildsubdir.stdout}}/tests/common"
+          args:
+            chdir: "{{buildsubdir.stdout}}"
+
+      always:
+        - name: teardown VM
+          qemu_teardown:
+            statedir: "{{qemu.statedir}}"
+
+        - name: fetch vmcheck results
+          synchronize:
+            src: "{{buildsubdir.stdout}}/vmcheck/"
+            dest: "{{artifacts}}/vmcheck"
+            mode: pull
+            delete: yes
+
+        - name: delete temporary dir
+          file: path="{{tmpd.path}}" state=absent

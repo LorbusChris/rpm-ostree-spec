@@ -1,0 +1,6 @@
+# we have to specify an inventory here so that the standard
+# roles' qcow2 handler doesn't kick in (we provision the VM
+# ourselves because we need to run outside of the VM, not
+# within)
+
+localhost ansible_connection=local
