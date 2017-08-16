@@ -12,7 +12,6 @@ import tempfile
 # HACK: Ansible requires this exact string to be here
 from ansible.module_utils.basic import *
 
-#
 # Test this module like this
 #
 # echo '{ "ANSIBLE_MODULE_ARGS": { "subjects": "cloud.qcow2" } }' \
