@@ -1,7 +1,7 @@
 Summary: Hybrid image/package system
 Name: rpm-ostree
-Version: 2017.7
-Release: 7%{?dist}
+Version: 2017.8
+Release: 1%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
@@ -17,7 +17,7 @@ BuildRequires: gperf
 BuildRequires: gnome-common
 BuildRequires: /usr/bin/g-ir-scanner
 # Core requirements
-BuildRequires: pkgconfig(ostree-1) >= 2017.6
+BuildRequires: pkgconfig(ostree-1) >= 2017.10
 BuildRequires: pkgconfig(polkit-gobject-1)
 BuildRequires: pkgconfig(json-glib-1.0)
 BuildRequires: pkgconfig(rpm)
@@ -148,6 +148,9 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Fri Aug 18 2017 Jonathan Lebon <jlebon@redhat.com> - 2017.8-1
+- New upstream version
+
 * Thu Aug 10 2017 Igor Gnatenko <ignatenko@redhat.com> - 2017.7-7
 - Rebuilt for RPM soname bump
 
