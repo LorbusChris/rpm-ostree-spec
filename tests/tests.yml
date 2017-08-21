@@ -10,6 +10,7 @@
       with_items:
         - koji
         - rpm-build
+        - dnf-plugins-core
 
     - name: provision VM
       qemu_provision:
@@ -39,6 +40,9 @@
 
         - set_fact:
             srpmpath: "{{tmpd.path}}/{{srpm.stdout}}"
+
+        - name: install build dependencies
+          command: dnf builddep -y {{srpmpath}}
 
         - name: extract source rpm
           command: >
