@@ -109,6 +109,14 @@ def main(argv):
                            "-output", cloudinit, userdata, metadata], stdout=null)
 
     log = module.params.get("log") or os.devnull
+    artifacts = os.path.dirname(log)
+
+    # Make sure the log directory exists
+    try:
+        os.makedirs(artifacts)
+    except OSError as exc:
+        if exc.errno != errno.EEXIST or not os.path.isdir(artifacts):
+            raise
 
     inventory = os.path.join(directory, "inventory")
     with open(inventory, 'w') as f:
