@@ -1,5 +1,8 @@
 ---
 - hosts: localhost
+  vars:
+    artifacts: "{{ lookup('env', 'TEST_ARTIFACTS')|default('./artifacts', true) }}"
+    subjects: "{{ lookup('env', 'TEST_SUBJECTS')}}"
   tags:
     - atomic
   tasks:
