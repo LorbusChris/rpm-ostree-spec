@@ -79,9 +79,5 @@
             chdir: "{{srcdir}}"
 
         always:
-        - name: fetch vmcheck results
-          synchronize:
-            src: "{{srcdir}}/vmcheck/"
-            dest: "{{artifacts}}/vmcheck"
-            mode: pull
-            delete: yes
+        - name: Fetch test results
+          command: rsync -a --delete {{srcdir}}/vmcheck/ {{artifacts}}/vmcheck
