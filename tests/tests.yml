@@ -64,14 +64,6 @@
 
       - name: Get rpm-ostree status
         command: "{{vmssh}} rpm-ostree status --json"
-        register: status
-      - set_fact:
-          status_json: "{{ status.stdout | from_json }}"
-      - command: "{{vmssh}} ostree refs {{ status_json['deployments'][0]['origin'] }} --create vmcheck"
-      - command: "{{vmssh}} rpm-ostree rebase :vmcheck"
-      # XXX: use ans_reboot.yml from a-h-t
-      - shell: "{{vmssh}} shutdown -r now"
-        ignore_errors: true
 
       - name: Run vmcheck
         block:
