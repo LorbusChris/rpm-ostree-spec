@@ -1,7 +1,7 @@
 Summary: Hybrid image/package system
 Name: rpm-ostree
-Version: 2017.8
-Release: 2%{?dist}
+Version: 2017.9
+Release: 1%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
@@ -18,7 +18,7 @@ BuildRequires: gperf
 BuildRequires: gnome-common
 BuildRequires: /usr/bin/g-ir-scanner
 # Core requirements
-BuildRequires: pkgconfig(ostree-1) >= 2017.10
+BuildRequires: pkgconfig(ostree-1) >= 2017.11
 BuildRequires: pkgconfig(polkit-gobject-1)
 BuildRequires: pkgconfig(json-glib-1.0)
 BuildRequires: pkgconfig(rpm)
@@ -29,8 +29,6 @@ BuildRequires: libattr-devel
 
 # We currently interact directly with librepo
 BuildRequires: pkgconfig(librepo)
-
-Patch0: 0001-DnfRepo-allow-metadata_expire-value-of-0.patch
 
 # libdnf bundling
 # We're using RPATH to pick up our bundled version
@@ -151,6 +149,9 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Mon Sep 25 2017 Jonathan Lebon <jlebon@redhat.com> - 2017.9-1
+- New upstream version
+
 * Mon Aug 21 2017 Jonathan Lebon <jlebon@redhat.com> - 2017.8-2
 - Patch to allow metadata_expire=0
   https://github.com/projectatomic/rpm-ostree/issues/930
