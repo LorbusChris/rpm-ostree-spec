@@ -61,6 +61,8 @@ Requires: ostree
 Requires: bubblewrap
 Requires: fuse
 
+Requires: %{name}-libs%{?_isa} = %{version}-%{release}
+
 %description
 rpm-ostree is a hybrid image/package system.  It supports
 "composing" packages on a build server into an OSTree repository,
@@ -79,7 +81,7 @@ The %{name}-libs package includes the shared library for %{name}.
 %package devel
 Summary: Development headers for %{name}
 Group: Development/Libraries
-Requires: %{name}-libs = %{version}-%{release}
+Requires: %{name}-libs%{?_isa} = %{version}-%{release}
 
 %description devel
 The %{name}-devel package includes the header files for %{name}-libs.
