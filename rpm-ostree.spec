@@ -1,13 +1,14 @@
 Summary: Hybrid image/package system
 Name: rpm-ostree
 Version: 2017.10
-Release: 1%{?dist}
+Release: 2%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
 License: LGPLv2+
 URL: https://github.com/projectatomic/rpm-ostree
 
+Patch0: 0001-compose-CLI-fix-repo-consuming-two-arguments.patch
 
 # We always run autogen.sh
 BuildRequires: autoconf automake libtool git
@@ -151,6 +152,10 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Sun Nov 14 2017 Jonathan Lebon <jlebon@redhat.com> - 2017.10-2
+- Backport fix for --repo handling
+  https://github.com/projectatomic/rpm-ostree/pull/1101
+
 * Thu Nov 02 2017 Colin Walters <walters@verbum.org> - 2017.10-1
 - https://github.com/projectatomic/rpm-ostree/releases/tag/v2017.10
 
