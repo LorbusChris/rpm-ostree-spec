@@ -1,7 +1,7 @@
 Summary: Hybrid image/package system
 Name: rpm-ostree
 Version: 2017.10
-Release: 2%{?dist}
+Release: 3%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
@@ -9,6 +9,7 @@ License: LGPLv2+
 URL: https://github.com/projectatomic/rpm-ostree
 
 Patch0: 0001-compose-CLI-fix-repo-consuming-two-arguments.patch
+Patch1: 0001-postprocess-Add-envvar-option-and-detect-NFS-skip-os.patch
 
 # We always run autogen.sh
 BuildRequires: autoconf automake libtool git
@@ -152,6 +153,10 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Wed Nov 22 2017 Colin Walters <walters@verbum.org> - 2017.10-3
+- Backport patch for NFS issues
+- https://pagure.io/atomic-wg/issue/387
+
 * Sun Nov 14 2017 Jonathan Lebon <jlebon@redhat.com> - 2017.10-2
 - Backport fix for --repo handling
   https://github.com/projectatomic/rpm-ostree/pull/1101
