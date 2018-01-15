@@ -1,6 +1,6 @@
 Summary: Hybrid image/package system
 Name: rpm-ostree
-Version: 2017.11
+Version: 2018.1
 Release: 1%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
@@ -150,6 +150,9 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Mon Jan 15 2018 Colin Walters <walters@verbum.org> - 2018.1-1
+- https://github.com/projectatomic/rpm-ostree/releases/tag/v2018.1
+
 * Tue Dec 04 2017 Jonathan Lebon <jlebon@redhat.com> - 2017.11-1
 - New upstream version
 
