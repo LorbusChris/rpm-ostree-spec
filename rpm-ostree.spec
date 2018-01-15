@@ -17,7 +17,7 @@ BuildRequires: gperf
 BuildRequires: gnome-common
 BuildRequires: /usr/bin/g-ir-scanner
 # Core requirements
-BuildRequires: pkgconfig(ostree-1) >= 2017.14
+BuildRequires: pkgconfig(ostree-1) >= 2017.15
 BuildRequires: pkgconfig(polkit-gobject-1)
 BuildRequires: pkgconfig(json-glib-1.0)
 BuildRequires: pkgconfig(rpm)
