@@ -125,6 +125,7 @@ python autofiles.py > files \
   '%{_libdir}/%{name}' \
   '%{_mandir}/man*/*' \
   '%{_sysconfdir}/dbus-1/system.d/*' \
+  '%{_sysconfdir}/rpm-ostreed.conf' \
   '%{_prefix}/lib/systemd/system/*' \
   '%{_libexecdir}/rpm-ostree*' \
   '%{_datadir}/polkit-1/actions/*.policy' \
