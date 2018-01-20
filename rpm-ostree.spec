@@ -1,12 +1,14 @@
 Summary: Hybrid image/package system
 Name: rpm-ostree
 Version: 2018.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
 License: LGPLv2+
 URL: https://github.com/projectatomic/rpm-ostree
+
+Patch0: 0001-Revert-status-Prefix-ostree-refspecs-with-ostree.patch
 
 # We always run autogen.sh
 BuildRequires: autoconf automake libtool git
@@ -151,6 +153,10 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Fri Jan 19 2018 Dusty Mabe <dusty@dustymabe.com> - 2018.1-2
+- Revert the ostree:// formatting in the output.
+- See https://github.com/projectatomic/rpm-ostree/pull/1136#issuecomment-358122137
+
 * Mon Jan 15 2018 Colin Walters <walters@verbum.org> - 2018.1-1
 - https://github.com/projectatomic/rpm-ostree/releases/tag/v2018.1
 

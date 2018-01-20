@@ -1,0 +1,39 @@
+From 677c80b7f9eb145d863f2735fb0e9ec96c3f2c49 Mon Sep 17 00:00:00 2001
+From: Dusty Mabe <dusty@dustymabe.com>
+Date: Fri, 19 Jan 2018 21:01:31 -0500
+Subject: [PATCH] Revert "status: Prefix ostree refspecs with ostree://"
+
+This reverts commit d99175f664983a9ae6f73a95568639fcd3568b34.
+---
+ src/app/rpmostree-builtin-status.c | 2 +-
+ tests/check/test-basic.sh          | 1 -
+ 2 files changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/src/app/rpmostree-builtin-status.c b/src/app/rpmostree-builtin-status.c
+index 282ef17..bbaa697 100644
+--- a/src/app/rpmostree-builtin-status.c
++++ b/src/app/rpmostree-builtin-status.c
+@@ -305,7 +305,7 @@ status_generic (RPMOSTreeSysroot *sysroot_proxy,
+       g_print ("%s ", is_booted ? libsd_special_glyph (BLACK_CIRCLE) : " ");
+ 
+       if (origin_refspec)
+-        g_print ("ostree://%s", origin_refspec);
++        g_print ("%s", origin_refspec);
+       else
+         g_print ("%s", checksum);
+       g_print ("\n");
+diff --git a/tests/check/test-basic.sh b/tests/check/test-basic.sh
+index d36441e..645c258 100755
+--- a/tests/check/test-basic.sh
++++ b/tests/check/test-basic.sh
+@@ -50,7 +50,6 @@ assert_status_jq '.deployments[0].version == "1.0.10"'
+ echo "ok status shows right version"
+ 
+ rpm-ostree status > status.txt
+-assert_file_has_content status.txt '  ostree://testos:testos/buildmaster/x86_64-runtime'
+ assert_file_has_content status.txt 'Version: 1.0.10'
+ assert_not_file_has_content status.txt StateRoot:
+ rpm-ostree status -v > status.txt
+-- 
+2.14.3
+
