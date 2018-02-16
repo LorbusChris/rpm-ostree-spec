@@ -8,8 +8,6 @@ Source0: rpm-ostree-%{version}.tar.xz
 License: LGPLv2+
 URL: https://github.com/projectatomic/rpm-ostree
 
-Patch0: 0001-Revert-status-Prefix-ostree-refspecs-with-ostree.patch
-
 # We always run autogen.sh
 BuildRequires: autoconf automake libtool git
 # For docs
@@ -166,14 +164,14 @@ python autofiles.py > files.devel \
 * Mon Jan 15 2018 Colin Walters <walters@verbum.org> - 2018.1-1
 - https://github.com/projectatomic/rpm-ostree/releases/tag/v2018.1
 
-* Tue Dec 04 2017 Jonathan Lebon <jlebon@redhat.com> - 2017.11-1
+* Tue Dec 05 2017 Jonathan Lebon <jlebon@redhat.com> - 2017.11-1
 - New upstream version
 
 * Wed Nov 22 2017 Colin Walters <walters@verbum.org> - 2017.10-3
 - Backport patch for NFS issues
 - https://pagure.io/atomic-wg/issue/387
 
-* Sun Nov 14 2017 Jonathan Lebon <jlebon@redhat.com> - 2017.10-2
+* Sun Nov 12 2017 Jonathan Lebon <jlebon@redhat.com> - 2017.10-2
 - Backport fix for --repo handling
   https://github.com/projectatomic/rpm-ostree/pull/1101
 
