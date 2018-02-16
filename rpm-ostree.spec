@@ -1,7 +1,7 @@
 Summary: Hybrid image/package system
 Name: rpm-ostree
-Version: 2018.1
-Release: 3%{?dist}
+Version: 2018.2
+Release: 1%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
@@ -153,6 +153,9 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Fri Feb 16 2018 Jonathan Lebon <jlebon@redhat.com> - 2018.2-1
+- New upstream version
+
 * Fri Feb 09 2018 Fedora Release Engineering <releng@fedoraproject.org> - 2018.1-3
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_28_Mass_Rebuild
 
