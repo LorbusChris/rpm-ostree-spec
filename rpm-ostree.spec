@@ -1,12 +1,14 @@
 Summary: Hybrid image/package system
 Name: rpm-ostree
 Version: 2018.3
-Release: 1%{?dist}
+Release: 2%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
 License: LGPLv2+
 URL: https://github.com/projectatomic/rpm-ostree
+
+Patch0: 0001-compose-Also-treat-FUSE-as-a-netfs.patch
 
 # We always run autogen.sh
 BuildRequires: autoconf automake libtool git
@@ -151,6 +153,10 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Thu Mar 01 2018 Dusty Mabe <dusty@dustymabe.com> - 2018.3-2
+- backport treating FUSE as netfs
+- See https://github.com/projectatomic/rpm-ostree/pull/1285
+
 * Sun Feb 18 2018 Jonathan Lebon <jlebon@redhat.com> - 2018.3-1
 - New upstream version (minor bugfix release)
 
