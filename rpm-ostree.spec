@@ -1,7 +1,7 @@
 Summary: Hybrid image/package system
 Name: rpm-ostree
 Version: 2018.3
-Release: 2%{?dist}
+Release: 3%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
@@ -48,6 +48,9 @@ BuildRequires: libsolv-devel
 %else
 BuildRequires: pkgconfig(libsolv)
 %endif
+
+# We need g++ for libdnf
+BuildRequires: gcc-c++
 
 # In CentOS7/RHEL the package is client-only right now, but we can do both
 %if 0%{?rhel} != 0 && 0%{?rhel} <= 7
@@ -153,6 +156,9 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Wed Mar 07 2018 Jonathan Lebon <jlebon@redhat.com> - 2018.3-3
+- Add BR on gcc-c++
+
 * Thu Mar 01 2018 Dusty Mabe <dusty@dustymabe.com> - 2018.3-2
 - backport treating FUSE as netfs
 - See https://github.com/projectatomic/rpm-ostree/pull/1285
