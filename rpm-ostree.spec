@@ -1,7 +1,7 @@
 Summary: Hybrid image/package system
 Name: rpm-ostree
 Version: 2018.3
-Release: 3%{?dist}
+Release: 4%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
@@ -41,8 +41,8 @@ BuildRequires: pkgconfig(librepo)
 BuildRequires: cmake
 BuildRequires: pkgconfig(expat)
 BuildRequires: pkgconfig(check)
-BuildRequires: python-devel
-BuildRequires: python-sphinx
+BuildRequires: python2-devel
+BuildRequires: python2-sphinx
 %if (0%{?rhel} != 0 && 0%{?rhel} <= 7)
 BuildRequires: libsolv-devel
 %else
@@ -156,6 +156,10 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Sun Mar 18 2018 Iryna Shcherbina <ishcherb@redhat.com> - 2018.3-4
+- Update Python 2 dependency declarations to new packaging standards
+  (See https://fedoraproject.org/wiki/FinalizingFedoraSwitchtoPython3)
+
 * Wed Mar 07 2018 Jonathan Lebon <jlebon@redhat.com> - 2018.3-3
 - Add BR on gcc-c++
 
