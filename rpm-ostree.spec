@@ -1,14 +1,12 @@
 Summary: Hybrid image/package system
 Name: rpm-ostree
-Version: 2018.3
-Release: 4%{?dist}
+Version: 2018.4
+Release: 1%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
 Source0: rpm-ostree-%{version}.tar.xz
 License: LGPLv2+
 URL: https://github.com/projectatomic/rpm-ostree
-
-Patch0: 0001-compose-Also-treat-FUSE-as-a-netfs.patch
 
 # We always run autogen.sh
 BuildRequires: autoconf automake libtool git
@@ -156,6 +154,9 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Mon Mar 26 2018 Jonathan Lebon <jonathan@jlebon.com> - 2018.4-1
+- New upstream version
+
 * Sun Mar 18 2018 Iryna Shcherbina <ishcherb@redhat.com> - 2018.3-4
 - Update Python 2 dependency declarations to new packaging standards
   (See https://fedoraproject.org/wiki/FinalizingFedoraSwitchtoPython3)
