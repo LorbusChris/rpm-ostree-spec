@@ -40,7 +40,12 @@ BuildRequires: cmake
 BuildRequires: pkgconfig(expat)
 BuildRequires: pkgconfig(check)
 BuildRequires: python2-devel
+# https://github.com/CentOS/sig-atomic-buildscripts/issues/324
+%if (0%{?rhel} != 0 && 0%{?rhel} <= 7)
+BuildRequires: python-sphinx
+%else
 BuildRequires: python2-sphinx
+%endif
 %if (0%{?rhel} != 0 && 0%{?rhel} <= 7)
 BuildRequires: libsolv-devel
 %else
