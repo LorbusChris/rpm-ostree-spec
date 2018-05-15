@@ -1,6 +1,6 @@
 Summary: Hybrid image/package system
 Name: rpm-ostree
-Version: 2018.4
+Version: 2018.5
 Release: 1%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
@@ -17,7 +17,7 @@ BuildRequires: gperf
 BuildRequires: gnome-common
 BuildRequires: /usr/bin/g-ir-scanner
 # Core requirements
-BuildRequires: pkgconfig(ostree-1) >= 2018.2
+BuildRequires: pkgconfig(ostree-1) >= 2018.5
 BuildRequires: pkgconfig(polkit-gobject-1)
 BuildRequires: pkgconfig(json-glib-1.0)
 BuildRequires: pkgconfig(rpm)
@@ -159,6 +159,9 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Tue May 15 2018 Jonathan Lebon <jonathan@jlebon.com> - 2018.5-1
+- New upstream version
+
 * Mon Mar 26 2018 Jonathan Lebon <jonathan@jlebon.com> - 2018.4-1
 - New upstream version
 
