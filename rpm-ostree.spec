@@ -1,13 +1,27 @@
+# Upstream has --enable-rust, but let's use it by default in Fedora
+# Note the Rust sources are in the tarball using cargo-vendor.
+%if 0%{?fedora} >= 28
+%bcond_without rust
+%else
+%bcond_with rust
+%endif
+
 Summary: Hybrid image/package system
 Name: rpm-ostree
 Version: 2018.6
 Release: 1%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
-# This tarball is generated via "make -f Makefile.dist-packaging dist-snapshot"
+# This tarball is generated via "cd packaging && make -f Makefile.dist-packaging dist-snapshot"
+# in the upstream git.  If rust is enabled, it contains vendored sources.
 Source0: rpm-ostree-%{version}.tar.xz
 License: LGPLv2+
 URL: https://github.com/projectatomic/rpm-ostree
 
+%if %{with rust}
+ExclusiveArch: %{rust_arches}
+BuildRequires: cargo
+BuildRequires: rust-packaging
+%endif
 # We always run autogen.sh
 BuildRequires: autoconf automake libtool git
 # For docs
@@ -98,7 +112,8 @@ The %{name}-devel package includes the header files for %{name}-libs.
 
 %build
 env NOCONFIGURE=1 ./autogen.sh
-%configure --disable-silent-rules --enable-gtk-doc
+%configure --disable-silent-rules --enable-gtk-doc \
+           %{?with_rust:--enable-rust}
 make %{?_smp_mflags}
 
 %install
