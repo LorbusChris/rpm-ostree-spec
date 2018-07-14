@@ -9,7 +9,7 @@
 Summary: Hybrid image/package system
 Name: rpm-ostree
 Version: 2018.6
-Release: 2%{?dist}
+Release: 3%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "cd packaging && make -f Makefile.dist-packaging dist-snapshot"
 # in the upstream git.  If rust is enabled, it contains vendored sources.
@@ -174,6 +174,9 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Sat Jul 14 2018 Fedora Release Engineering <releng@fedoraproject.org> - 2018.6-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
+
 * Fri Jun 29 2018 Jonathan Lebon <jonathan@jlebon.com> - 2018.6-2
 - Rebuild for yummy Rusty bitsy
 
