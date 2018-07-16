@@ -14,6 +14,7 @@ Release: 3%{?dist}
 # This tarball is generated via "cd packaging && make -f Makefile.dist-packaging dist-snapshot"
 # in the upstream git.  If rust is enabled, it contains vendored sources.
 Source0: rpm-ostree-%{version}.tar.xz
+Patch1: 0001-build-sys-Use-python3-for-libdnf-by-default-if-avail.patch
 License: LGPLv2+
 URL: https://github.com/projectatomic/rpm-ostree
 
@@ -53,12 +54,13 @@ BuildRequires: pkgconfig(librepo)
 BuildRequires: cmake
 BuildRequires: pkgconfig(expat)
 BuildRequires: pkgconfig(check)
-BuildRequires: python2-devel
 # https://github.com/CentOS/sig-atomic-buildscripts/issues/324
 %if (0%{?rhel} != 0 && 0%{?rhel} <= 7)
+BuildRequires: python-devel
 BuildRequires: python-sphinx
 %else
-BuildRequires: python2-sphinx
+BuildRequires: python3-sphinx
+BuildRequires: python3-devel
 %endif
 %if (0%{?rhel} != 0 && 0%{?rhel} <= 7)
 BuildRequires: libsolv-devel
@@ -127,7 +129,6 @@ find $RPM_BUILD_ROOT -name '*.la' -delete
 # way the same spec file works more easily across multiple versions where e.g. an
 # older version might not have a systemd unit file.
 cat > autofiles.py <<EOF
-#!/usr/bin/python
 import os,sys,glob
 os.chdir(os.environ['RPM_BUILD_ROOT'])
 for line in sys.argv[1:]:
@@ -143,7 +144,11 @@ for line in sys.argv[1:]:
         else:
             sys.stderr.write('{0} did not match any files\n'.format(line))
 EOF
-python autofiles.py > files \
+PYTHON=python3
+if ! test -x /usr/bin/python3; then
+    PYTHON=python2
+fi
+$PYTHON autofiles.py > files \
   '%{_bindir}/*' \
   '%{_libdir}/%{name}' \
   '%{_mandir}/man*/*' \
@@ -154,11 +159,11 @@ python autofiles.py > files \
   '%{_datadir}/polkit-1/actions/*.policy' \
   '%{_datadir}/dbus-1/system-services'
 
-python autofiles.py > files.lib \
+$PYTHON autofiles.py > files.lib \
   '%{_libdir}/*.so.*' \
   '%{_libdir}/girepository-1.0/*.typelib'
 
-python autofiles.py > files.devel \
+$PYTHON autofiles.py > files.devel \
   '%{_libdir}/lib*.so' \
   '%{_includedir}/*' \
   '%{_datadir}/dbus-1/interfaces/org.projectatomic.rpmostree1.xml' \
@@ -174,8 +179,8 @@ python autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
-* Sat Jul 14 2018 Fedora Release Engineering <releng@fedoraproject.org> - 2018.6-3
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_29_Mass_Rebuild
+* Mon Jul 16 2018 Colin Walters <walters@verbum.org> - 2018.6-3
+- Make build python3-only compatible for distributions that want that
 
 * Fri Jun 29 2018 Jonathan Lebon <jonathan@jlebon.com> - 2018.6-2
 - Rebuild for yummy Rusty bitsy
