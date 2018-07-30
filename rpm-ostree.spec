@@ -9,12 +9,13 @@
 Summary: Hybrid image/package system
 Name: rpm-ostree
 Version: 2018.6
-Release: 3%{?dist}
+Release: 4%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "cd packaging && make -f Makefile.dist-packaging dist-snapshot"
 # in the upstream git.  If rust is enabled, it contains vendored sources.
 Source0: rpm-ostree-%{version}.tar.xz
 Patch1: 0001-build-sys-Use-python3-for-libdnf-by-default-if-avail.patch
+Patch2: 0001-core-Use-new-rpmtsSetVfyLevel-API-for-writing-rpmdb.patch
 License: LGPLv2+
 URL: https://github.com/projectatomic/rpm-ostree
 
@@ -179,6 +180,10 @@ $PYTHON autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Mon Jul 30 2018 Colin Walters <walters@verbum.org> - 2018.6-4
+- Backport patch for https://bugzilla.redhat.com/show_bug.cgi?id=1607223
+  from https://github.com/projectatomic/rpm-ostree/pull/1469
+
 * Mon Jul 16 2018 Colin Walters <walters@verbum.org> - 2018.6-3
 - Make build python3-only compatible for distributions that want that
 
