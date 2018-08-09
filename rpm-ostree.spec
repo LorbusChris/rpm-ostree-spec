@@ -1,7 +1,12 @@
 # Upstream has --enable-rust, but let's use it by default in Fedora
 # Note the Rust sources are in the tarball using cargo-vendor.
-%if 0%{?fedora} >= 28
+# For RHEL we need the toolset.
+%if 0%{?fedora} >= 28 || 0%{?rhel} > 7
 %bcond_without rust
+%if 0%{?rhel} > 7
+%define rusttoolset_version rust-toolset-1.26
+%define rusttoolset scl enable %{rusttoolset_version} --
+%endif
 %else
 %bcond_with rust
 %endif
@@ -19,8 +24,11 @@ URL: https://github.com/projectatomic/rpm-ostree
 
 %if %{with rust}
 ExclusiveArch: %{rust_arches}
-BuildRequires: cargo
-BuildRequires: rust-packaging
+%if %{defined rusttoolset_version}
+BuildRequires: %{rusttoolset_version}-cargo
+%else
+BuildRequires: cargo rust-packaging
+%endif
 %endif
 # We always run autogen.sh
 BuildRequires: autoconf automake libtool git
@@ -112,13 +120,16 @@ The %{name}-devel package includes the header files for %{name}-libs.
 %autosetup -Sgit -n %{name}-%{version}
 
 %build
-env NOCONFIGURE=1 ./autogen.sh
+%{?rusttoolset} env NOCONFIGURE=1 ./autogen.sh
+# Override the invocation of ./configure, since %configure is multi-line, we
+# can't just prefix it with scl enable.
+%define _configure %{?rusttoolset} ./configure
 %configure --disable-silent-rules --enable-gtk-doc \
            %{?with_rust:--enable-rust}
-make %{?_smp_mflags}
+%{?rusttoolset} make %{?_smp_mflags}
 
 %install
-make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p -c"
+%{?rusttoolset} make install DESTDIR=$RPM_BUILD_ROOT INSTALL="install -p -c"
 find $RPM_BUILD_ROOT -name '*.la' -delete
 
 # I try to do continuous delivery via rpmdistro-gitoverlay while
