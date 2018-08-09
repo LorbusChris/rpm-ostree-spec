@@ -8,7 +8,7 @@
 
 Summary: Hybrid image/package system
 Name: rpm-ostree
-Version: 2018.6.42.gda27b94b
+Version: 2018.7
 Release: 1%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "cd packaging && make -f Makefile.dist-packaging dist-snapshot"
@@ -53,14 +53,6 @@ BuildRequires: pkgconfig(librepo)
 BuildRequires: cmake
 BuildRequires: pkgconfig(expat)
 BuildRequires: pkgconfig(check)
-# https://github.com/CentOS/sig-atomic-buildscripts/issues/324
-%if (0%{?rhel} != 0 && 0%{?rhel} <= 7)
-BuildRequires: python-devel
-BuildRequires: python-sphinx
-%else
-BuildRequires: python3-sphinx
-BuildRequires: python3-devel
-%endif
 %if (0%{?rhel} != 0 && 0%{?rhel} <= 7)
 BuildRequires: libsolv-devel
 %else
@@ -178,6 +170,9 @@ $PYTHON autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
+* Thu Aug 09 2018 Jonathan Lebon <jonathan@jlebon.com> - 2018.7-1
+- New upstream version
+
 * Wed Aug 01 2018 Jonathan Lebon <jonathan@jlebon.com> - 2018.6.42.gda27b94b-1
 - git master snapshot for https://bugzilla.redhat.com/show_bug.cgi?id=1565647
 
