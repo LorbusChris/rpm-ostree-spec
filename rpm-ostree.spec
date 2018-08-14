@@ -30,6 +30,8 @@ BuildRequires: %{rusttoolset_version}-cargo
 BuildRequires: cargo rust-packaging
 %endif
 %endif
+# For the autofiles bits below
+BuildRequires: /usr/bin/python3
 # We always run autogen.sh
 BuildRequires: autoconf automake libtool git
 # For docs
