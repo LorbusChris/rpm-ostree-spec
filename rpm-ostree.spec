@@ -1,6 +1,6 @@
 # Upstream has --enable-rust, but let's use it by default in Fedora
 # Note the Rust sources are in the tarball using cargo-vendor.
-# For RHEL we need the toolset.
+# For RHEL > 7 we need the toolset.
 %if 0%{?fedora} >= 28 || 0%{?rhel} > 7
 %bcond_without rust
 %if 0%{?rhel} > 7
@@ -23,13 +23,22 @@ License: LGPLv2+
 URL: https://github.com/projectatomic/rpm-ostree
 
 %if %{with rust}
+%if !%{defined rust_arches}
+# It's not defined yet in the base CentOS7 root
+%define rust_arches x86_64 i686 armv7hl aarch64 ppc64 ppc64le s390x
+%endif # defined rust_arches
 ExclusiveArch: %{rust_arches}
 %if %{defined rusttoolset_version}
 BuildRequires: %{rusttoolset_version}-cargo
 %else
-BuildRequires: cargo rust-packaging
+%endif # defined rusttoolset_version
+# This one is only in Fedora, we're not actually using it right now
+# but we may in the future.
+%if 0%{?fedora} >= 28
+BuildRequires: rust-packaging
 %endif
-%endif
+BuildRequires: cargo
+%endif # with_rust
 # For the autofiles bits below
 BuildRequires: /usr/bin/python3
 # We always run autogen.sh
