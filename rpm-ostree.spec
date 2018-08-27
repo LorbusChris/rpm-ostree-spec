@@ -124,7 +124,7 @@ The %{name}-devel package includes the header files for %{name}-libs.
 
 %build
 %{?rusttoolset} env NOCONFIGURE=1 ./autogen.sh
-# Override the invocation of ./configure, since %configure is multi-line, we
+# Override the invocation of ./configure, since %%configure is multi-line, we
 # can't just prefix it with scl enable.
 %define _configure %{?rusttoolset} ./configure
 %configure --disable-silent-rules --enable-gtk-doc \
