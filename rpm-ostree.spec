@@ -31,13 +31,13 @@ ExclusiveArch: %{rust_arches}
 %if %{defined rusttoolset_version}
 BuildRequires: %{rusttoolset_version}-cargo
 %else
-%endif # defined rusttoolset_version
 # This one is only in Fedora, we're not actually using it right now
 # but we may in the future.
 %if 0%{?fedora} >= 28
 BuildRequires: rust-packaging
 %endif
 BuildRequires: cargo
+%endif # defined rusttoolset_version
 %endif # with_rust
 # For the autofiles bits below
 BuildRequires: /usr/bin/python3
