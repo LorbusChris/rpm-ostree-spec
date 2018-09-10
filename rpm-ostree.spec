@@ -63,6 +63,9 @@ BuildRequires: libattr-devel
 # We currently interact directly with librepo
 BuildRequires: pkgconfig(librepo)
 
+# Needed by curl-rust
+BuildRequires: pkgconfig(libcurl)
+
 # libdnf bundling
 # We're using RPATH to pick up our bundled version
 %global __requires_exclude ^libdnf[.]so[.].*$
@@ -193,7 +196,7 @@ $PYTHON autofiles.py > files.devel \
 %files devel -f files.devel
 
 %changelog
-* Thu Sep 10 2018 Jonathan Lebon <jonathan@jlebon.com> - 2018.8-1
+* Tue Sep 11 2018 Jonathan Lebon <jonathan@jlebon.com> - 2018.8-1
 - New upstream version
 
 * Thu Aug 09 2018 Jonathan Lebon <jonathan@jlebon.com> - 2018.7-1
