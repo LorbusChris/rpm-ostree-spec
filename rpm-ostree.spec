@@ -13,7 +13,7 @@
 
 Summary: Hybrid image/package system
 Name: rpm-ostree
-Version: 2018.8
+Version: 2018.8.102.gc2fa908
 Release: 1%{?dist}
 #VCS: https://github.com/cgwalters/rpm-ostree
 # This tarball is generated via "cd packaging && make -f Makefile.dist-packaging dist-snapshot"
@@ -581,4 +581,3 @@ $PYTHON autofiles.py > files.devel \
 
 * Fri Mar 07 2014 Colin Walters <walters@verbum.org> - 2014.5-1
 - Initial package
-
